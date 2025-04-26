@@ -30,3 +30,24 @@ Ein *Salt* ist ein zufällig generierter Wert, der vor dem Hashing dem Passwort 
 **Beispiel:** aus `password123` wird `password123q9ct`, und daraus wird der Hash `3c5b2047a0b25bf7aa3b812b70f832184248d8f7c4bb84dd9a6023117cfe6e9f` gemacht.  
 
 Ein *Pepper* funktioniert gleich, man hängt ihn vor das Passwort. Der Unterschied beim Pepper ist, dass er nicht zusammen mit dem Passwort abgespeichert wird, sondern an einem besser gesicherten Ort. Bei einem allfälligen DB-Leak können keine bereits bekannten Hashes auf Passwörter zurückgeführt werden. Meistens gibt es einen einzigen Pepper für jede Applikation.
+
+### Umsetzen
+
+#### Neues Passwort hashen
+
+Ich verwende die Java-Library "Guava", um das Passwort zu hashen.
+Den Pepper speichere ich hardcoded in meinem Repository und für den Salt generiere ich einen zufälligen String (der nicht mit `$` enden darf).
+
+Der Code unten hasht das Passwort zusammen mit Pepper und Salt, dann wird das Salt dem Hashcode angehängt und so in der DB gespeichert.
+
+```java
+var pepper = "+jb)tN*R?Y@l";
+var salt = generateSalt();
+
+var seasonedPassword = pepper + salt + password;
+String hashedPassword = Hashing.sha256()
+        .hashString(seasonedPassword, StandardCharsets.UTF_8)
+        .toString();
+
+return salt + "$" + hashedPassword;
+```
