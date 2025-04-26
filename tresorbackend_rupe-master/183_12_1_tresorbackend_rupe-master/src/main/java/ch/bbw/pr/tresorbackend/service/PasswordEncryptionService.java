@@ -18,9 +18,13 @@ public class PasswordEncryptionService {
 
    public PasswordEncryptionService() {}
 
-   public String hashPassword(String password) throws NoSuchAlgorithmException {
-      var salt = generateSalt();
 
+   public String encryptPassword(String password) throws NoSuchAlgorithmException {
+      var salt = generateSalt();
+      return encryptPassword(password, salt);
+   }
+
+   public String encryptPassword(String password, String salt) throws NoSuchAlgorithmException {
       var seasonedPassword = pepper + salt + password;
       String hashedPassword = Hashing.sha256()
               .hashString(seasonedPassword, StandardCharsets.UTF_8)
@@ -29,7 +33,14 @@ public class PasswordEncryptionService {
       return salt + "$" + hashedPassword;
    }
 
-   public String getSaltFromHashedPassword(String hashedPassword) {
+   public boolean doPasswordsMatch(String password, String hashedPassword) throws NoSuchAlgorithmException {
+      var salt = getSaltFromHashedPassword(hashedPassword);
+      var hashedVerifyingPassword = encryptPassword(password, salt);
+
+      return hashedPassword.equals(hashedVerifyingPassword);
+   }
+
+   private String getSaltFromHashedPassword(String hashedPassword) {
       return hashedPassword.split("\\$")[0];
    }
 

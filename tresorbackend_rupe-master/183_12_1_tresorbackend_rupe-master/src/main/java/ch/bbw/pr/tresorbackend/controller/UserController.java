@@ -50,6 +50,10 @@ public class UserController {
       this.passwordService = passwordService;
    }
 
+   public ResponseEntity doLoginUser(@RequestBody LoginUser loginUser, BindingResult bindingResult) {
+
+   }
+
    // build create User REST API
    @CrossOrigin(origins = "${CROSS_ORIGIN}")
    @PostMapping
@@ -87,7 +91,7 @@ public class UserController {
             registerUser.getFirstName(),
             registerUser.getLastName(),
             registerUser.getEmail(),
-            passwordService.hashPassword(registerUser.getPassword())
+            passwordService.encryptPassword(registerUser.getPassword())
             );
 
       User savedUser = userService.createUser(user);
