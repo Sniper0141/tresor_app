@@ -6,10 +6,10 @@ Hier ist dokumentiert, wie die Sicherheit der Tresor-App schrittweise verbessert
 
 ### Requirements
 
-- Beim Registrieren wird das Passwort als Hash in der DB gespeichert.
-- Der Hash verwendet Salt und Pepper.
-- Beim Anmelden (login) wird das Passwort erneut ge-hashed und mit den Hash in der Datenbank verglichen werden.
-- Bestehende Klartext-Passwörter in der DB müssen ersetzt werden.
+> - Beim Registrieren wird das Passwort als Hash in der DB gespeichert.
+> - Der Hash verwendet Salt und Pepper.
+> - Beim Anmelden (login) wird das Passwort erneut ge-hashed und mit den Hash in der Datenbank verglichen werden.
+> - Bestehende Klartext-Passwörter in der DB müssen ersetzt werden.
 
 ### Informieren 
 
@@ -30,4 +30,3 @@ Ein *Salt* ist ein zufällig generierter Wert, der vor dem Hashing dem Passwort 
 **Beispiel:** aus `password123` wird `password123q9ct`, und daraus wird der Hash `3c5b2047a0b25bf7aa3b812b70f832184248d8f7c4bb84dd9a6023117cfe6e9f` gemacht.  
 
 Ein *Pepper* funktioniert gleich, man hängt ihn vor das Passwort. Der Unterschied beim Pepper ist, dass er nicht zusammen mit dem Passwort abgespeichert wird, sondern an einem besser gesicherten Ort. Bei einem allfälligen DB-Leak können keine bereits bekannten Hashes auf Passwörter zurückgeführt werden. Meistens gibt es einen einzigen Pepper für jede Applikation.
-
