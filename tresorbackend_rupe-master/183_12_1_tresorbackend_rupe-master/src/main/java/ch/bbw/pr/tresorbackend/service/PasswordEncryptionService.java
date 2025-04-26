@@ -29,6 +29,10 @@ public class PasswordEncryptionService {
       return salt + "$" + hashedPassword;
    }
 
+   public String getSaltFromHashedPassword(String hashedPassword) {
+      return hashedPassword.split("\\$")[0];
+   }
+
    private String generateSalt() {
       byte[] saltByteArray = new byte[16];
       var random = new SecureRandom();
