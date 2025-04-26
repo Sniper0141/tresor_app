@@ -1,6 +1,11 @@
 package ch.bbw.pr.tresorbackend.service;
 
+import com.google.common.hash.Hashing;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * PasswordEncryptionService
@@ -8,14 +13,34 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PasswordEncryptionService {
-   //todo ergänzen!
 
-   public PasswordEncryptionService() {
-      //todo anpassen!
+   String pepper = "+jb)tN*R?Y@l";
+
+   public PasswordEncryptionService() {}
+
+   public String hashPassword(String password) throws NoSuchAlgorithmException {
+      var salt = generateSalt();
+
+      var seasonedPassword = pepper + salt + password;
+      String hashedPassword = Hashing.sha256()
+              .hashString(seasonedPassword, StandardCharsets.UTF_8)
+              .toString();
+
+      return salt + "$" + hashedPassword;
    }
 
-   public String hashPassword(String password) {
-      //todo anpassen!
-      return password;
+   private String generateSalt() {
+      byte[] saltByteArray = new byte[16];
+      var random = new SecureRandom();
+
+      String salt;
+      do {
+         random.nextBytes(saltByteArray);
+         salt = new String(saltByteArray, StandardCharsets.UTF_8);
+
+      } while (salt.endsWith("$"));
+
+      System.out.println(salt);
+      return salt;
    }
 }
