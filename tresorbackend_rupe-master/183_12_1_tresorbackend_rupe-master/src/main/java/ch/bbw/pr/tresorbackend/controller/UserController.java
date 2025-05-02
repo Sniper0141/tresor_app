@@ -1,9 +1,6 @@
 package ch.bbw.pr.tresorbackend.controller;
 
-import ch.bbw.pr.tresorbackend.model.ConfigProperties;
-import ch.bbw.pr.tresorbackend.model.EmailAdress;
-import ch.bbw.pr.tresorbackend.model.RegisterUser;
-import ch.bbw.pr.tresorbackend.model.User;
+import ch.bbw.pr.tresorbackend.model.*;
 import ch.bbw.pr.tresorbackend.service.PasswordEncryptionService;
 import ch.bbw.pr.tresorbackend.service.UserService;
 
@@ -21,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,13 +48,13 @@ public class UserController {
 
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PostMapping
-    public ResponseEntity<Boolean> doLoginUser(@RequestBody LoginUser loginUser, BindingResult bindingResult) throws NoSuchAlgorithmException {
+    public ResponseEntity<String> doLoginUser(@RequestBody LoginUser loginUser, BindingResult bindingResult) throws NoSuchAlgorithmException {
         //input validation
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
                     .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
-                    .collect(Collectors.toList());
-            System.out.println("UserController.createUser " + errors);
+                    .toList();
+            System.out.println("UserController.doLoginUser " + errors);
 
             JsonArray arr = new JsonArray();
             errors.forEach(arr::add);
@@ -66,26 +62,27 @@ public class UserController {
             obj.add("message", arr);
             String json = new Gson().toJson(obj);
 
-            System.out.println("UserController.createUser, validation fails: " + json);
+            System.out.println("UserController.doLoginUser, validation fails: " + json);
             return ResponseEntity.badRequest().body(json);
         }
-        System.out.println("UserController.createUser: input validation passed");
+
+        System.out.println("UserController.doLoginUser: input validation passed");
 
         var user = userService.findByEmail(loginUser.getEmail());
         if(user == null){
             logger.info("UserController.doLoginUser: User not found with email: " + loginUser.getEmail());
-            return ResponseEntity.badRequest().body(false);
+            return ResponseEntity.badRequest().body("Email or password incorrect.");
         }
 
         var actualPassword = user.getPassword();
         var loginPassword = loginUser.getPassword();
         if(!passwordService.doPasswordsMatch(loginPassword, actualPassword)){
             logger.info("UserController.doLoginUser: Passwords do not match");
-            return ResponseEntity.badRequest().body(false);
+            return ResponseEntity.badRequest().body("Email or password incorrect.");
         }
 
         logger.info("UserController.doLoginUser: Login passed");
-        return ResponseEntity.ok(true);
+        return ResponseEntity.ok("Login successful.");
     }
 
     // build create User REST API
@@ -96,22 +93,13 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
-               .collect(Collectors.toList());
-            System.out.println("UserController.createUser " + errors);
-
-            JsonArray arr = new JsonArray();
-            errors.forEach(arr::add);
-            JsonObject obj = new JsonObject();
-            obj.add("message", arr);
-            String json = new Gson().toJson(obj);
-
-            System.out.println("UserController.createUser, validation fails: " + json);
-            return ResponseEntity.badRequest().body(json);
+               .toList();
+            return validateInput(errors);
         }
         System.out.println("UserController.createUser: input validation passed");
 
         // password validation
-        var errorString = ValidatePassword(registerUser.getPassword());
+        var errorString = validatePassword(registerUser.getPassword());
         if (!errorString.isEmpty()) {
             return ResponseEntity.badRequest().body(errorString);
         }
@@ -141,7 +129,20 @@ public class UserController {
         return ResponseEntity.accepted().body(json);
     }
 
-    private String ValidatePassword(String password) {
+    private ResponseEntity<String> validateInput(List<String> errors) {
+        System.out.println("UserController.createUser " + errors);
+
+        JsonArray arr = new JsonArray();
+        errors.forEach(arr::add);
+        JsonObject obj = new JsonObject();
+        obj.add("message", arr);
+        String json = new Gson().toJson(obj);
+
+        System.out.println("UserController.createUser, validation fails: " + json);
+        return ResponseEntity.badRequest().body(json);
+    }
+
+    private String validatePassword(String password) {
         var errorString = "";
 
         if(!password.matches("/[a-z]/g")){
@@ -207,16 +208,7 @@ public class UserController {
             List<String> errors = bindingResult.getFieldErrors().stream()
                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                .collect(Collectors.toList());
-            System.out.println("UserController.createUser " + errors);
-
-            JsonArray arr = new JsonArray();
-            errors.forEach(arr::add);
-            JsonObject obj = new JsonObject();
-            obj.add("message", arr);
-            String json = new Gson().toJson(obj);
-
-            System.out.println("UserController.createUser, validation fails: " + json);
-            return ResponseEntity.badRequest().body(json);
+            return validateInput(errors);
         }
 
         System.out.println("UserController.getUserIdByEmail: input validation passed");
