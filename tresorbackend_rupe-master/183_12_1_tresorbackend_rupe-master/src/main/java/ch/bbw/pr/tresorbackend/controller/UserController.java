@@ -50,6 +50,44 @@ public class UserController {
         this.passwordService = passwordService;
     }
 
+    @CrossOrigin(origins = "${CROSS_ORIGIN}")
+    @PostMapping
+    public ResponseEntity<Boolean> doLoginUser(@RequestBody LoginUser loginUser, BindingResult bindingResult) throws NoSuchAlgorithmException {
+        //input validation
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                    .collect(Collectors.toList());
+            System.out.println("UserController.createUser " + errors);
+
+            JsonArray arr = new JsonArray();
+            errors.forEach(arr::add);
+            JsonObject obj = new JsonObject();
+            obj.add("message", arr);
+            String json = new Gson().toJson(obj);
+
+            System.out.println("UserController.createUser, validation fails: " + json);
+            return ResponseEntity.badRequest().body(json);
+        }
+        System.out.println("UserController.createUser: input validation passed");
+
+        var user = userService.findByEmail(loginUser.getEmail());
+        if(user == null){
+            logger.info("UserController.doLoginUser: User not found with email: " + loginUser.getEmail());
+            return ResponseEntity.badRequest().body(false);
+        }
+
+        var actualPassword = user.getPassword();
+        var loginPassword = loginUser.getPassword();
+        if(!passwordService.doPasswordsMatch(loginPassword, actualPassword)){
+            logger.info("UserController.doLoginUser: Passwords do not match");
+            return ResponseEntity.badRequest().body(false);
+        }
+
+        logger.info("UserController.doLoginUser: Login passed");
+        return ResponseEntity.ok(true);
+    }
+
     // build create User REST API
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PostMapping
