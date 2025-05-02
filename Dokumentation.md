@@ -33,7 +33,7 @@ Ein *Pepper* funktioniert gleich, man hängt ihn vor das Passwort. Der Unterschi
 
 ### Umsetzen
 
-#### Neues Passwort hashen
+#### Hash beim Registrieren
 
 Ich verwende die Java-Library "Guava", um das Passwort zu hashen.
 Den Pepper speichere ich hardcoded in meinem Repository und für den Salt generiere ich einen zufälligen String (der nicht mit `$` enden darf).
@@ -51,3 +51,5 @@ String hashedPassword = Hashing.sha256()
 
 return salt + "$" + hashedPassword;
 ```
+
+#### Has beim Login
