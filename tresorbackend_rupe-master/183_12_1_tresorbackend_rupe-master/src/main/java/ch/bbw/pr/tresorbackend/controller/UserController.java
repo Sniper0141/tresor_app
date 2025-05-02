@@ -88,7 +88,13 @@ public class UserController {
             registerUser.getEmail(),
             passwordService.encryptPassword(registerUser.getPassword()));
 
-        User savedUser = userService.createUser(user);
+        try{
+            userService.createUser(user);
+        }
+        catch (Exception e){
+            ResponseEntity.internalServerError().body("Failed to create user.");
+        }
+
         System.out.println("UserController.createUser, user saved in db");
         JsonObject obj = new JsonObject();
         obj.addProperty("answer", "User Saved");
