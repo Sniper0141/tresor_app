@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
-    @PostMapping
+    @PostMapping("login")
     public ResponseEntity<String> doLoginUser(@RequestBody LoginUser loginUser, BindingResult bindingResult) throws NoSuchAlgorithmException {
         //input validation
         if (bindingResult.hasErrors()) {
@@ -82,7 +82,9 @@ public class UserController {
         }
 
         logger.info("UserController.doLoginUser: Login passed");
-        return ResponseEntity.ok("Login successful.");
+        var responseObj = new LoginResponse("Login successful.", user.getId());
+        var responseBody = new Gson().toJson(responseObj);
+        return ResponseEntity.ok().body(responseBody);
     }
 
     // build create User REST API
