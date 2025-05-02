@@ -21,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,7 +73,10 @@ public class UserController {
         System.out.println("UserController.createUser: input validation passed");
 
         // password validation
-
+        var errorString = ValidatePassword(registerUser.getPassword());
+        if (!errorString.isEmpty()) {
+            return ResponseEntity.badRequest().body(errorString);
+        }
 
         System.out.println("UserController.createUser, password validation passed");
 
@@ -82,8 +86,7 @@ public class UserController {
             registerUser.getFirstName(),
             registerUser.getLastName(),
             registerUser.getEmail(),
-            passwordService.encryptPassword(registerUser.getPassword())
-            );
+            passwordService.encryptPassword(registerUser.getPassword()));
 
         User savedUser = userService.createUser(user);
         System.out.println("UserController.createUser, user saved in db");
@@ -92,6 +95,25 @@ public class UserController {
         String json = new Gson().toJson(obj);
         System.out.println("UserController.createUser " + json);
         return ResponseEntity.accepted().body(json);
+    }
+
+    private String ValidatePassword(String password) {
+        var errorString = "";
+
+        if(!password.matches("/[a-z]/g")){
+            errorString += "Must contain lowercase letters.\n";
+        }
+        if(!password.matches("/[A-Z]/g")){
+            errorString += "Must contain uppercase letters.\n";
+        }
+        if(!password.matches("/[0-9]/g")){
+            errorString += "Must contain numbers.\n";
+        }
+        if(password.length() < 8){
+            errorString += "Must be at least 8 characters.\n";
+        }
+
+        return errorString;
     }
 
     // build get user by id REST API
