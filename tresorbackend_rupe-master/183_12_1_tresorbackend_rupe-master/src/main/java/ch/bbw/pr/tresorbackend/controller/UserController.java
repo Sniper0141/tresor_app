@@ -95,7 +95,7 @@ public class UserController {
         //todo ergänzen
 
         System.out.println("UserController.createUser: captcha passed.");
-        
+
         //input validation
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
