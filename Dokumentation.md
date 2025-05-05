@@ -52,4 +52,9 @@ String hashedPassword = Hashing.sha256()
 return salt + "$" + hashedPassword;
 ```
 
-#### Has beim Login
+#### Hash beim Login
+
+Wenn der User eine korrekte Email angibt, wird der Hash (TODO!!!) des eingegebenen Passwort zum Backend geschickt und wird dort mit dem abgespeicherten Hash verglichen (Passwort im backend nicht mehr nochmals hashen!!!). Wenn die Hashes übereinstimmen, wird eine Message und die UserId als Response geschickt.
+
+*Zusätzliche Sicherheitsmassnahme:*  
+Falls es keinen User mit der angegebenen Email gibt, kommt die gleiche Antwort wie bei einem falschen Passwort, damit kein User weis, welche Email tatsächlich einen Account hat.
