@@ -33,7 +33,6 @@ public class UserController {
     private UserService userService;
     private PasswordEncryptionService passwordService;
     private final ConfigProperties configProperties;
-    private final String emailOrPasswordIncorrect = "Email or password incorrect.";
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
@@ -72,14 +71,14 @@ public class UserController {
         var user = userService.findByEmail(loginUser.getEmail());
         if(user == null){
             logger.info("UserController.doLoginUser: User not found with email: " + loginUser.getEmail());
-            return ResponseEntity.badRequest().body(emailOrPasswordIncorrect);
+            return GetWrongEmailOrPasswordResponse();
         }
 
         var actualPassword = user.getPassword();
         var loginPassword = loginUser.getPassword();
         if(!passwordService.doPasswordsMatch(loginPassword, actualPassword)){
             logger.info("UserController.doLoginUser: Passwords do not match");
-            return ResponseEntity.badRequest().body(emailOrPasswordIncorrect);
+            return GetWrongEmailOrPasswordResponse();
         }
 
         logger.info("UserController.doLoginUser: Login passed");
@@ -237,5 +236,9 @@ public class UserController {
         }
 
         return errorString;
+    }
+
+    private ResponseEntity<String> GetWrongEmailOrPasswordResponse(){
+        return ResponseEntity.badRequest().body("Email or password incorrect.");
     }
 }
