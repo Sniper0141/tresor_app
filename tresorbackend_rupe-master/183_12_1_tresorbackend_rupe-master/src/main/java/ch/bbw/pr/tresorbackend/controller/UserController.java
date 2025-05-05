@@ -136,38 +136,6 @@ public class UserController {
         return ResponseEntity.accepted().body(json);
     }
 
-    private ResponseEntity<String> validateInput(List<String> errors) {
-        System.out.println("UserController.createUser " + errors);
-
-        JsonArray arr = new JsonArray();
-        errors.forEach(arr::add);
-        JsonObject obj = new JsonObject();
-        obj.add("message", arr);
-        String json = new Gson().toJson(obj);
-
-        System.out.println("UserController.createUser, validation fails: " + json);
-        return ResponseEntity.badRequest().body(json);
-    }
-
-    private String validatePassword(String password) {
-        var errorString = "";
-
-        if(!password.matches("/[a-z]/g")){
-            errorString += "Must contain lowercase letters.\n";
-        }
-        if(!password.matches("/[A-Z]/g")){
-            errorString += "Must contain uppercase letters.\n";
-        }
-        if(!password.matches("/[0-9]/g")){
-            errorString += "Must contain numbers.\n";
-        }
-        if(password.length() < 8){
-            errorString += "Must be at least 8 characters.\n";
-        }
-
-        return errorString;
-    }
-
     // build get user by id REST API
     // http://localhost:8080/api/users/1
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
@@ -236,5 +204,37 @@ public class UserController {
         String json = new Gson().toJson(obj);
         System.out.println("UserController.getUserIdByEmail " + json);
         return ResponseEntity.accepted().body(json);
+    }
+
+    private ResponseEntity<String> validateInput(List<String> errors) {
+        System.out.println("UserController.createUser " + errors);
+
+        JsonArray arr = new JsonArray();
+        errors.forEach(arr::add);
+        JsonObject obj = new JsonObject();
+        obj.add("message", arr);
+        String json = new Gson().toJson(obj);
+
+        System.out.println("UserController.createUser, validation fails: " + json);
+        return ResponseEntity.badRequest().body(json);
+    }
+
+    private String validatePassword(String password) {
+        var errorString = "";
+
+        if(!password.matches("/[a-z]/g")){
+            errorString += "Must contain lowercase letters.\n";
+        }
+        if(!password.matches("/[A-Z]/g")){
+            errorString += "Must contain uppercase letters.\n";
+        }
+        if(!password.matches("/[0-9]/g")){
+            errorString += "Must contain numbers.\n";
+        }
+        if(password.length() < 8){
+            errorString += "Must be at least 8 characters.\n";
+        }
+
+        return errorString;
     }
 }
