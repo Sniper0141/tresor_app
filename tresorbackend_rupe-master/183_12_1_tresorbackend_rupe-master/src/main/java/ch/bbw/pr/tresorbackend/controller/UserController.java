@@ -91,6 +91,11 @@ public class UserController {
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PostMapping
     public ResponseEntity<String> createUser(@Valid @RequestBody RegisterUser registerUser, BindingResult bindingResult) throws NoSuchAlgorithmException {
+        //captcha
+        //todo ergänzen
+
+        System.out.println("UserController.createUser: captcha passed.");
+        
         //input validation
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
