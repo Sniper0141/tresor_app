@@ -69,3 +69,36 @@ export const postUser = async (content) => {
         throw new Error('Failed to save user. ' || error.message);
     }
 };
+
+export const postLogin = async (content) => {
+    const protocol = process.env.REACT_APP_API_PROTOCOL; // "http"
+    const host = process.env.REACT_APP_API_HOST; // "localhost"
+    const port = process.env.REACT_APP_API_PORT; // "8080"
+    const path = process.env.REACT_APP_API_PATH; // "/api"
+    const portPart = port ? `:${port}` : ''; // port is optional
+    const API_URL = `${protocol}://${host}${portPart}${path}`;
+
+    try {
+        const response = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: `${content.email}`,
+                password: `${content.password}`
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Server response failed.');
+        }
+        const data = await response.json();
+        console.log('Login successfully posted:', data);
+        return data;
+    } catch (error) {
+        console.error('Failed to post login:', error.message);
+        throw new Error('Failed to do login. ' || error.message);
+    }
+};
