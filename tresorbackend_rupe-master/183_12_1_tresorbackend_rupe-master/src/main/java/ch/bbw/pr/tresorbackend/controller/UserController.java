@@ -239,6 +239,6 @@ public class UserController {
     }
 
     private ResponseEntity<String> GetWrongEmailOrPasswordResponse(){
-        return ResponseEntity.badRequest().body("Email or password incorrect.");
+        return ResponseEntity.ok().body("Email or password incorrect.");
     }
 }
