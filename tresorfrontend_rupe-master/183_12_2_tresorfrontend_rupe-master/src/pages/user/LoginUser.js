@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { postLogin } from "../../comunication/FetchUser";
 
 /**
  * LoginUser
@@ -7,9 +8,14 @@ import { useNavigate } from 'react-router-dom';
 function LoginUser({loginValues, setLoginValues}) {
     const navigate = useNavigate();
 
+    const [responseMessage, setResponseMessage] = useState("");
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log(loginValues);
+        var result = await postLogin(loginValues)
+        setResponseMessage(result.message)
+
         navigate('/')
     };
 
@@ -45,6 +51,7 @@ function LoginUser({loginValues, setLoginValues}) {
                 </section>
                 <button type="submit">Login</button>
             </form>
+            <p>{responseMessage}</p>
         </div>
     );
 }
