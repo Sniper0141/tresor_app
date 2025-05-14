@@ -79,7 +79,7 @@ export const postLogin = async (content) => {
     const API_URL = `${protocol}://${host}${portPart}${path}`;
 
     try {
-        const response = await fetch(`${API_URL}/login`, {
+        const response = await fetch(`${API_URL}/users/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
