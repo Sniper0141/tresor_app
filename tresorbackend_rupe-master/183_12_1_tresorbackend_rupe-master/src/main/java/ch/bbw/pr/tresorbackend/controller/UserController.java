@@ -223,13 +223,13 @@ public class UserController {
     private String validatePassword(String password) {
         var errorString = "";
 
-        if(!password.matches("/[a-z]/g")){
+        if(!password.matches(".*[a-z].*")){
             errorString += "Must contain lowercase letters.\n";
         }
-        if(!password.matches("/[A-Z]/g")){
+        if(!password.matches(".*[A-Z].*")){
             errorString += "Must contain uppercase letters.\n";
         }
-        if(!password.matches("/[0-9]/g")){
+        if(!password.matches(".*[0-9].*")){
             errorString += "Must contain numbers.\n";
         }
         if(password.length() < 8){
