@@ -54,7 +54,8 @@ return salt + "$" + hashedPassword;
 
 #### Hash beim Login
 
-Wenn der User eine korrekte Email angibt, das Passwort zum Backend geschickt. Der Hash des Passwortes wird mit dem abgespeicherten Hash verglichen (Passwort im backend nicht mehr nochmals hashen!!!). Wenn die Hashes übereinstimmen, wird eine Message und die UserId als Response geschickt.
+Das Passwort wird zum Backend geschickt. Der Hash des Passwortes wird mit dem abgespeicherten Hash verglichen. Wenn die Hashes übereinstimmen, ist das Login erfolgreich. Eine Message und die UserId werden als Response geschickt. Wenn das Login nicht erfolgreich ist, wird der Fehler als "Message" mit einer UserId `0` als Response geschickt. 
 
-> *Zusätzliche Sicherheitsmassnahme:*  
-> Falls es keinen User mit der angegebenen Email gibt, kommt die > gleiche Antwort wie bei einem falschen Passwort, damit kein User weis, welche Email tatsächlich einen Account hat.
+> *Zusätzliche Features:*  
+> - Falls es keinen User mit der angegebenen Email gibt, kommt die gleiche Antwort wie bei einem falschen Passwort. So kann verhindert werden, dass Hacker herausfinden, welche Emails einen Account haben.  
+> - Falls ein Login fehlschlägt, bleibt man auf der Login-Page und die Error-Message wird dem User angezeigt.
