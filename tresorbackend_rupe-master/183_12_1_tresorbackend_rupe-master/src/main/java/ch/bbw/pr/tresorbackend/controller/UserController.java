@@ -71,14 +71,14 @@ public class UserController {
         var user = userService.findByEmail(loginUser.getEmail());
         if(user == null){
             logger.info("UserController.doLoginUser: User not found with email: " + loginUser.getEmail());
-            return GetWrongEmailOrPasswordResponse();
+            return GetWrongEmailOrPasswordResponse(0);
         }
 
         var actualPassword = user.getPassword();
         var loginPassword = loginUser.getPassword();
         if(!passwordService.doPasswordsMatch(loginPassword, actualPassword)){
             logger.info("UserController.doLoginUser: Passwords do not match");
-            return GetWrongEmailOrPasswordResponse();
+            return GetWrongEmailOrPasswordResponse(user.getId());
         }
 
         logger.info("UserController.doLoginUser: Login passed");
@@ -238,7 +238,9 @@ public class UserController {
         return errorString;
     }
 
-    private ResponseEntity<String> GetWrongEmailOrPasswordResponse(){
-        return ResponseEntity.ok().body("Email or password incorrect.");
+    private ResponseEntity<String> GetWrongEmailOrPasswordResponse(long userId){
+        var response = new LoginResponse("Email or password incorrect.", userId);
+        var responseJson = new Gson().toJson(response);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseJson);
     }
 }
