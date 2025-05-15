@@ -90,8 +90,6 @@ export const postLogin = async (content) => {
             })
         });
 
-        console.log(response);
-
         const data = await response.json();
 
         if(response.status === 200){
