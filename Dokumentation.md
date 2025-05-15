@@ -64,3 +64,4 @@ Das Passwort wird zum Backend geschickt. Der Hash des Passwortes wird mit dem ab
 
 Ich habe eine Klasse `OneTimeEncryptionScript` erstellt, die alle Einträge rausliest und sie mithilfe des `PasswordEncryptionService` gehasht abspeichert.  
 Beim Applikationsstart wird die Klasse aufgerufen. Ich führe die Applikation einmal aus lösche den Aufruf der Klasse wieder.
+Zum kontrollieren, ob die Encryption funktioniert hat, habe ich mit DBeaver nachgeschaut.
