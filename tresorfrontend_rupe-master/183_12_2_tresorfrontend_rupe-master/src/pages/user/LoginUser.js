@@ -14,8 +14,12 @@ function LoginUser({loginValues, setLoginValues}) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log(loginValues);
-        var result = await postLogin(loginValues)
-        setResponseMessage(result.message)
+        var error = await postLogin(loginValues)
+
+        if(error != null){
+            setResponseMessage(error.message)
+            return;
+        }
 
         navigate('/')
     };

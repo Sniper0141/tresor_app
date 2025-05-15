@@ -90,13 +90,22 @@ export const postLogin = async (content) => {
             })
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Server response failed.');
-        }
+        console.log(response);
+
         const data = await response.json();
-        console.log('Login successfully posted:', data);
-        return data;
+
+        if(response.status === 200){
+            console.log('Login successfully posted:', data);
+            return null;
+        }
+
+        if(response.status === 401){
+            console.log('Login failed (401):', data);
+            return "Login failed.";
+        }
+
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Server response failed.');
     } catch (error) {
         console.error('Failed to post login:', error.message);
         throw new Error('Failed to do login. ' || error.message);
