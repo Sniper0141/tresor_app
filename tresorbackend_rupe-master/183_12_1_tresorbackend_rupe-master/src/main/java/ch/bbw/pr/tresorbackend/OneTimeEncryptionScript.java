@@ -2,10 +2,11 @@ package ch.bbw.pr.tresorbackend;
 
 import ch.bbw.pr.tresorbackend.repository.UserRepository;
 import ch.bbw.pr.tresorbackend.service.PasswordEncryptionService;
-import ch.bbw.pr.tresorbackend.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
 
+@Service
 public class OneTimeEncryptionScript {
     private final UserRepository userRepository;
     private final PasswordEncryptionService passwordEncryptionService;
