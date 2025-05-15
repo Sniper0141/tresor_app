@@ -1,4 +1,4 @@
-package ch.bbw.pr.tresorbackend;
+package ch.bbw.pr.tresorbackend.script;
 
 import ch.bbw.pr.tresorbackend.repository.UserRepository;
 import ch.bbw.pr.tresorbackend.service.PasswordEncryptionService;
