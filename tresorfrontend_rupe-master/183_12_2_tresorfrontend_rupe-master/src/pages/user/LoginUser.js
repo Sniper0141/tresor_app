@@ -17,7 +17,7 @@ function LoginUser({loginValues, setLoginValues}) {
         var error = await postLogin(loginValues)
 
         if(error != null){
-            setResponseMessage(error.message)
+            setResponseMessage(error)
             return;
         }
 
@@ -56,7 +56,7 @@ function LoginUser({loginValues, setLoginValues}) {
                 </section>
                 <button type="submit">Login</button>
             </form>
-            <p>{responseMessage}</p>
+            <p style={{color: 'red'}}>{responseMessage}</p>
         </div>
     );
 }
