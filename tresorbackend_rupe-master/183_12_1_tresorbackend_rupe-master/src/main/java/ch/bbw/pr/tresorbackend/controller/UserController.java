@@ -1,6 +1,5 @@
 package ch.bbw.pr.tresorbackend.controller;
 
-import ch.bbw.pr.tresorbackend.OneTimeEncryptionScript;
 import ch.bbw.pr.tresorbackend.model.*;
 import ch.bbw.pr.tresorbackend.service.PasswordEncryptionService;
 import ch.bbw.pr.tresorbackend.service.UserService;
@@ -38,7 +37,7 @@ public class UserController {
 
 
     @Autowired
-    public UserController(ConfigProperties configProperties, UserService userService, PasswordEncryptionService passwordService, OneTimeEncryptionScript script) throws NoSuchAlgorithmException {
+    public UserController(ConfigProperties configProperties, UserService userService, PasswordEncryptionService passwordService) {
         this.configProperties = configProperties;
         System.out.println("UserController.UserController: cross origin: " + configProperties.getOrigin());
         // Logging in the constructor
@@ -46,7 +45,6 @@ public class UserController {
         logger.debug("UserController.UserController: Cross Origin Config: {}", configProperties.getOrigin());
         this.userService = userService;
         this.passwordService = passwordService;
-        script.EncryptPasswords();
     }
 
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
