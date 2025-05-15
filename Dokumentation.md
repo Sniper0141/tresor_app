@@ -59,3 +59,8 @@ Das Passwort wird zum Backend geschickt. Der Hash des Passwortes wird mit dem ab
 > *Zusätzliche Features:*  
 > - Falls es keinen User mit der angegebenen Email gibt, kommt die gleiche Antwort wie bei einem falschen Passwort. So kann verhindert werden, dass Hacker herausfinden, welche Emails einen Account haben.  
 > - Falls ein Login fehlschlägt, bleibt man auf der Login-Page und die Error-Message wird dem User angezeigt.
+
+#### Existierende Passwörter
+
+Ich habe eine Klasse `OneTimeEncryptionScript` erstellt, die alle Einträge rausliest und sie mithilfe des `PasswordEncryptionService` gehasht abspeichert.  
+Beim Applikationsstart wird die Klasse aufgerufen. Ich führe die Applikation einmal aus lösche den Aufruf der Klasse wieder.
