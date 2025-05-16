@@ -34,10 +34,10 @@ public class EncryptUtil {
       cipher.init(Cipher.ENCRYPT_MODE, getPublicKey());
 
       var salt = generateSalt();
-      var dataToEncrypt = salt + "$" + data;
+      var dataToEncrypt = salt + data;
       byte[] bytes = cipher.doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8));
 
-      return salt + new String(Base64.getEncoder().encode(bytes));
+      return new String(Base64.getEncoder().encode(bytes));
    }
 
    public String decrypt(String data) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
