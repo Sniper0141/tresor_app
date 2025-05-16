@@ -24,7 +24,4 @@ public class NewSecret {
 
    @NotNull (message="secret is required.")
    private JsonNode content;
-
-   @NotEmpty (message="encryption password id is required.")
-   private String encryptPassword;
 }
