@@ -73,8 +73,7 @@ Zum kontrollieren, ob die Encryption funktioniert hat, habe ich mit DBeaver nach
 > - Beim Lesen der Secrets müssen diese entschlüsselt werden.
 > - Der Schlüssel soll für jeden User unterschiedlich sein.
 
-### Informieren Asymmetrische Verschlüsselung
-
+### Informieren (Asymmetrische Verschlüsselung)
 
 Asymmetrische Verschlüsselung ist asymmetrisch, weil das Verschlüsseln und das Entschlüsseln verschiedene "Keys" braucht. Diese Verschlüsselungsart eignet sich perfekt für das Projekt, weil in der Aufgabenstellung auch von "privaten Schlüsseln" die Rede ist. 
 
@@ -95,5 +94,4 @@ Asymmetrische Verschlüsselung ist asymmetrisch, weil das Verschlüsseln und das
 
 - Wenn ich von meinem Kollegen eine geheime Nachricht erhalten will, kann ich ihm meinen Public-Key geben, damit mir er seine Klartext-Nachrichten sicher zukommen lassen kann. 
 - Ebenfalls er mir seinen Public-Key geben und in seiner verschlüsselten Nachricht seine Signatur mitgeben, so dass ich (mit seinem Public-Key) identifizieren kann, dass diese Nachricht von ihm stammt. 
-
 
