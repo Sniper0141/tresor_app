@@ -49,8 +49,13 @@ public class SecretController {
    private EncryptUtil encryptUtil;
    private static final Logger logger = LoggerFactory.getLogger(MasterKeyService.class);
 
-   public SecretController() throws FileNotFoundException {
-      encryptUtil = new EncryptUtil(masterKeyService.getMasterKey());
+   public SecretController(){
+      try{
+         encryptUtil = new EncryptUtil(masterKeyService.getMasterKey());
+      }
+      catch(FileNotFoundException e){
+         logger.error(e.getMessage());
+      }
    }
 
    // create secret REST API
