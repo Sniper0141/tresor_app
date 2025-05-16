@@ -33,8 +33,11 @@ public class EncryptUtil {
       Cipher cipher = Cipher.getInstance("RSA");
       cipher.init(Cipher.ENCRYPT_MODE, getPublicKey());
 
-      byte[] bytes = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
-      return new String(Base64.getEncoder().encode(bytes));
+      var salt = generateSalt();
+      var dataToEncrypt = salt + data;
+      byte[] bytes = cipher.doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8));
+
+      return salt + new String(Base64.getEncoder().encode(bytes));
    }
 
    public String decrypt(String data) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -42,8 +45,27 @@ public class EncryptUtil {
       Cipher cipher = Cipher.getInstance("RSA");
       cipher.init(Cipher.DECRYPT_MODE, getPrivateKey());
 
-      byte[] bytes = cipher.doFinal(Base64.getDecoder().decode(data));
-      return new String(bytes);
+      var encResult = new String(cipher.doFinal(Base64.getDecoder().decode(data))) ;
+      return getSecretDataFromDecryptedData(encResult);
+   }
+
+   private String getSecretDataFromDecryptedData(String secretData){
+      return secretData.split("\\$")[1];
+   }
+
+   private String generateSalt() {
+      byte[] saltByteArray = new byte[16];
+      var random = new SecureRandom();
+
+      String salt;
+      do {
+         random.nextBytes(saltByteArray);
+         salt = new String(saltByteArray, StandardCharsets.UTF_8);
+
+      } while (salt.contains("$"));
+
+      System.out.println(salt);
+      return salt;
    }
 
    private PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
