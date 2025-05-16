@@ -53,7 +53,7 @@ public class PasswordEncryptionService {
          random.nextBytes(saltByteArray);
          salt = new String(saltByteArray, StandardCharsets.UTF_8);
 
-      } while (salt.endsWith("$"));
+      } while (salt.contains("$"));
 
       System.out.println(salt);
       return salt;
