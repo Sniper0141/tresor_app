@@ -8,6 +8,7 @@ import ch.bbw.pr.tresorbackend.service.MasterKeyService;
 import ch.bbw.pr.tresorbackend.service.SecretService;
 import ch.bbw.pr.tresorbackend.service.UserService;
 import ch.bbw.pr.tresorbackend.util.EncryptUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -21,7 +22,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,9 +115,16 @@ public class SecretController {
       for(Secret secret: secrets) {
          try {
             secret.setContent(encryptUtil.decrypt(secret.getContent()));
-         } catch (EncryptionOperationNotPossibleException e) {
+         }
+         catch (EncryptionOperationNotPossibleException e) {
             System.out.println("SecretController.getSecretsByUserId " + e + " " + secret);
             secret.setContent("not encryptable. Wrong password?");
+         }
+         catch (NoSuchAlgorithmException | InvalidKeySpecException |
+                IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
+                BadPaddingException e){
+            System.out.println("SecretController.getSecretsByUserId " + e + " " + secret);
+            secret.setContent("Failed to decrypt this secret, try again...");
          }
       }
 
@@ -134,9 +149,16 @@ public class SecretController {
       for(Secret secret: secrets) {
          try {
             secret.setContent(encryptUtil.decrypt(secret.getContent()));
-         } catch (EncryptionOperationNotPossibleException e) {
+         }
+         catch (EncryptionOperationNotPossibleException e) {
             System.out.println("SecretController.getSecretsByEmail " + e + " " + secret);
             secret.setContent("not encryptable. Wrong password?");
+         }
+         catch (NoSuchAlgorithmException | InvalidKeySpecException |
+                IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
+                BadPaddingException e){
+            System.out.println("SecretController.getSecretsByEmail " + e + " " + secret);
+            secret.setContent("Failed to decrypt this secret, try again...");
          }
       }
 
@@ -179,8 +201,8 @@ public class SecretController {
       }
 
       //get Secret with id
-      Secret dbSecrete = secretService.getSecretById(secretId);
-      if(dbSecrete == null){
+      Secret dbSecret = secretService.getSecretById(secretId);
+      if(dbSecret == null){
          System.out.println("SecretController.updateSecret, secret not found in db");
          JsonObject obj = new JsonObject();
          obj.addProperty("answer", "Secret not found in db");
@@ -191,7 +213,7 @@ public class SecretController {
       User user = userService.findByEmail(newSecret.getEmail());
 
       //check if Secret in db has not same userid
-      if(dbSecrete.getUserId() != user.getId()){
+      if(dbSecret.getUserId() != user.getId()){
          System.out.println("SecretController.updateSecret, not same user id");
          JsonObject obj = new JsonObject();
          obj.addProperty("answer", "Secret has not same user id");
@@ -201,8 +223,9 @@ public class SecretController {
       }
       //check if Secret can be decrypted with password
       try {
-         encryptUtil.decrypt(dbSecrete.getContent());
-      } catch (EncryptionOperationNotPossibleException e) {
+         encryptUtil.decrypt(dbSecret.getContent());
+      }
+      catch (EncryptionOperationNotPossibleException e) {
          System.out.println("SecretController.updateSecret, invalid password");
          JsonObject obj = new JsonObject();
          obj.addProperty("answer", "Password not correct.");
@@ -210,13 +233,40 @@ public class SecretController {
          System.out.println("SecretController.updateSecret failed:" + json);
          return ResponseEntity.badRequest().body(json);
       }
+      catch (NoSuchAlgorithmException | InvalidKeySpecException |
+             IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
+             BadPaddingException e){
+         System.out.println("SecretController.updateSecret " + e + " " + dbSecret);
+
+         JsonObject obj = new JsonObject();
+         obj.addProperty("answer", "Internal Server Error (500)");
+         String json = new Gson().toJson(obj);
+         System.out.println("SecretController.updateSecret " + json);
+         return ResponseEntity.internalServerError().body(json);
+      }
+
       //modify Secret in db.
-      Secret secret = new Secret(
-            secretId,
-            user.getId(),
-            encryptUtil.encrypt(newSecret.getContent().toString())
-      );
-      Secret updatedSecret = secretService.updateSecret(secret);
+      Secret secret;
+      try {
+         secret = new Secret(
+                 secretId,
+                 user.getId(),
+                 encryptUtil.encrypt(newSecret.getContent().toString())
+         );
+         var updatedSecret = secretService.updateSecret(secret);
+      }
+      catch (NoSuchAlgorithmException | InvalidKeySpecException |
+             IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
+             BadPaddingException e){
+         System.out.println("SecretController.updateSecret " + e + " " + newSecret);
+
+         JsonObject obj = new JsonObject();
+         obj.addProperty("answer", "Internal Server Error (500)");
+         String json = new Gson().toJson(obj);
+         System.out.println("SecretController.updateSecret " + json);
+         return ResponseEntity.internalServerError().body(json);
+      }
+
       //save secret in db
       secretService.createSecret(secret);
       System.out.println("SecretController.updateSecret, secret updated in db");
