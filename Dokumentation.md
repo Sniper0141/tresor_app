@@ -106,3 +106,8 @@ UUIDs sind zusammengesetzt aus möglichst eindeutigen und möglichst random Info
 <img src="https://bootcamptoprod.com/wp-content/uploads/2024/01/Java-UUID-Structure.png" alt="UUIDs" width="400"/>
 
 Sie werden oft in Datenbanken verwendet, um Einträge eindeutig zu identifizieren.
+
+### Umsetzen (Variante 1)
+
+Ich habe mit Java-Libraries eine Encryption (und Decryption) mit Private- und Public-Keys umgesetzt.
+Den Master-Key (Private-Key) lade ich von der Festplatte, ausserhalb des Repositories, weil geheime Infos innerhalb eines Repos immer heikel sind. 
