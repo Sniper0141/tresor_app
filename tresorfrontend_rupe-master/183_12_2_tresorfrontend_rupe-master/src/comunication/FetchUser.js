@@ -57,9 +57,14 @@ export const postUser = async (content) => {
             })
         });
 
+        if(response.status === 400){
+            console.log('Registration failed (400):', response);
+            return response;
+        }
+
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Server response failed.');
+            const responseJson = await response.json();
+            throw new Error(responseJson.answer || 'Server response failed.');
         }
         const data = await response.json();
         console.log('User successfully posted:', data);

@@ -31,15 +31,23 @@ function RegisterUser({loginValues, setLoginValues}) {
             return;
         }
 
+        let response;
         try {
-            await postUser(credentials);
-            setLoginValues({userName: credentials.email, password: credentials.password});
-            setCredentials(initialState);
-            navigate('/');
+            response = await postUser(credentials);
         } catch (error) {
             console.error('Failed to fetch to server:', error.message);
             setErrorMessage(error.message);
+            return;
         }
+
+        if(response){
+            setErrorMessage(response);
+            return;
+        }
+
+        setLoginValues({userName: credentials.email, password: credentials.password});
+        setCredentials(initialState);
+        navigate('/');
     };
 
     return (
