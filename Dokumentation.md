@@ -95,3 +95,14 @@ Asymmetrische Verschlüsselung ist asymmetrisch, weil das Verschlüsseln und das
 - Wenn ich von meinem Kollegen eine geheime Nachricht erhalten will, kann ich ihm meinen Public-Key geben, damit mir er seine Klartext-Nachrichten sicher zukommen lassen kann. 
 - Ebenfalls er mir seinen Public-Key geben und in seiner verschlüsselten Nachricht seine Signatur mitgeben, so dass ich (mit seinem Public-Key) identifizieren kann, dass diese Nachricht von ihm stammt. 
 
+### Informieren (Eindeutige Schlüssel)
+
+Eindeutige Schlüssel sind Abfolgen von Zeichen, die innerhalb eines Systems (in der Theorie) genau einmal vorkommen können.
+
+Ein Beispiel dafür sind UUIDs.
+
+UUIDs sind zusammengesetzt aus möglichst eindeutigen und möglichst random Infos, wie z.B. der momentane Timestamp des Systems zum Zeitpunkt der Erzeugung. 
+
+<img src="https://bootcamptoprod.com/wp-content/uploads/2024/01/Java-UUID-Structure.png" alt="UUIDs" width="400"/>
+
+Sie werden oft in Datenbanken verwendet, um Einträge eindeutig zu identifizieren.
