@@ -65,3 +65,35 @@ Das Passwort wird zum Backend geschickt. Der Hash des Passwortes wird mit dem ab
 Ich habe eine Klasse `OneTimeEncryptionScript` erstellt, die alle Einträge rausliest und sie mithilfe des `PasswordEncryptionService` gehasht abspeichert.  
 Beim Applikationsstart wird die Klasse aufgerufen. Ich führe die Applikation einmal aus lösche den Aufruf der Klasse wieder.
 Zum kontrollieren, ob die Encryption funktioniert hat, habe ich mit DBeaver nachgeschaut.
+
+## Secret Encryption
+
+### Requirements
+> - Secrets in der Datenbank müssen verschlüsselt gespeichert werden.
+> - Beim Lesen der Secrets müssen diese entschlüsselt werden.
+> - Der Schlüssel soll für jeden User unterschiedlich sein.
+
+### Informieren Asymmetrische Verschlüsselung
+
+
+Asymmetrische Verschlüsselung ist asymmetrisch, weil das Verschlüsseln und das Entschlüsseln verschiedene "Keys" braucht. Diese Verschlüsselungsart eignet sich perfekt für das Projekt, weil in der Aufgabenstellung auch von "privaten Schlüsseln" die Rede ist. 
+
+#### So funktioniert es:
+
+- Es werden zwei random Keys generiert: Ein Public- und ein Private-Key. 
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Orange_blue_public_private_keygeneration_de.svg/1280px-Orange_blue_public_private_keygeneration_de.svg.png" alt="random keys" width="200"/>
+
+- Der Public-Key kann Klartext verschlüsseln und der Private-Key kann den verschlüsselten Text entschlüsseln. 
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Orange_blue_public_key_cryptography_de.svg/2880px-Orange_blue_public_key_cryptography_de.svg.png" alt="encryption" width="400"/>
+
+- Der Private-Key wird geheimgehalten, aber der Public-Key ist öffentlich.
+- Private-Keys können Signaturen (persönliches Identifikationsmittel) generieren, Public-Keys können bestätigen, dass diese Signatur auf ihren Private-Key zugeordnet werden kann.
+
+#### Beispiel:
+
+- Wenn ich von meinem Kollegen eine geheime Nachricht erhalten will, kann ich ihm meinen Public-Key geben, damit mir er seine Klartext-Nachrichten sicher zukommen lassen kann. 
+- Ebenfalls er mir seinen Public-Key geben und in seiner verschlüsselten Nachricht seine Signatur mitgeben, so dass ich (mit seinem Public-Key) identifizieren kann, dass diese Nachricht von ihm stammt. 
+
+
