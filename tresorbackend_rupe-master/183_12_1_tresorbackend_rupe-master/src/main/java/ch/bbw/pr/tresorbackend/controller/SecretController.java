@@ -47,7 +47,7 @@ public class SecretController {
    private MasterKeyService masterKeyService;
 
    private EncryptUtil encryptUtil;
-   private static final Logger logger = LoggerFactory.getLogger(MasterKeyService.class);
+   private static final Logger logger = LoggerFactory.getLogger(SecretController.class);
 
    public SecretController(){
       try{
