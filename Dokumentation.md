@@ -111,3 +111,5 @@ Sie werden oft in Datenbanken verwendet, um Einträge eindeutig zu identifiziere
 
 Ich habe mit Java-Libraries eine Encryption (und Decryption) mit Private- und Public-Keys umgesetzt.
 Den Master-Key (Private-Key) lade ich von der Festplatte, ausserhalb des Repositories, weil geheime Infos innerhalb eines Repos immer heikel sind. 
+
+Ich verwende für jedes Secret einen Salt. Ich encrypte ihn nur und speichere ihn nirgends ab. Ich encrypte nicht wie das Passwort, sondern ich setze noch ein `$` zwischen Salt und Secret, um den Salt vom Secret unterscheiden zu können.
