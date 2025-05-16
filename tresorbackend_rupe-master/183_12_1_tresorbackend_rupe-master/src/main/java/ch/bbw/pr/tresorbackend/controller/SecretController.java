@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -44,12 +45,12 @@ public class SecretController {
 
    private SecretService secretService;
    private UserService userService;
-   private MasterKeyService masterKeyService;
 
    private EncryptUtil encryptUtil;
    private static final Logger logger = LoggerFactory.getLogger(SecretController.class);
 
-   public SecretController(){
+   @Autowired
+   public SecretController(MasterKeyService masterKeyService){
       try{
          encryptUtil = new EncryptUtil(masterKeyService.getMasterKey());
       }
