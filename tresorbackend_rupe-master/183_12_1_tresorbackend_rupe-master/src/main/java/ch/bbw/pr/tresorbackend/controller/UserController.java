@@ -109,7 +109,12 @@ public class UserController {
         // password validation
         var errorString = validatePassword(registerUser.getPassword());
         if (!errorString.isEmpty()) {
-            return ResponseEntity.badRequest().body(errorString);
+
+            JsonObject obj = new JsonObject();
+            obj.addProperty("answer", errorString);
+            String json = new Gson().toJson(obj);
+
+            return ResponseEntity.badRequest().body(json);
         }
 
         System.out.println("UserController.createUser, password validation passed");
