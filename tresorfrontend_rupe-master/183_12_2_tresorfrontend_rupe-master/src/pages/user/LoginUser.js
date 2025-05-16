@@ -9,7 +9,7 @@ import { postLogin } from "../../comunication/FetchUser";
 function LoginUser({loginValues, setLoginValues}) {
     const navigate = useNavigate();
 
-    const [responseMessage, setResponseMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,7 +17,7 @@ function LoginUser({loginValues, setLoginValues}) {
         var error = await postLogin(loginValues)
 
         if(error != null){
-            setResponseMessage(error)
+            setErrorMessage(error)
             return;
         }
 
@@ -56,7 +56,7 @@ function LoginUser({loginValues, setLoginValues}) {
                 </section>
                 <button type="submit">Login</button>
             </form>
-            <p style={{color: 'red'}}>{responseMessage}</p>
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         </div>
     );
 }
