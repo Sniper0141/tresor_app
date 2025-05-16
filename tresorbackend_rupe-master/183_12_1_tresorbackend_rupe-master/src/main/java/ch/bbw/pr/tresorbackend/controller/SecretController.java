@@ -4,6 +4,7 @@ import ch.bbw.pr.tresorbackend.model.Secret;
 import ch.bbw.pr.tresorbackend.model.NewSecret;
 import ch.bbw.pr.tresorbackend.model.EncryptCredentials;
 import ch.bbw.pr.tresorbackend.model.User;
+import ch.bbw.pr.tresorbackend.service.MasterKeyService;
 import ch.bbw.pr.tresorbackend.service.SecretService;
 import ch.bbw.pr.tresorbackend.service.UserService;
 import ch.bbw.pr.tresorbackend.util.EncryptUtil;
@@ -13,11 +14,14 @@ import com.google.gson.JsonObject;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,14 @@ public class SecretController {
 
    private SecretService secretService;
    private UserService userService;
+   private MasterKeyService masterKeyService;
+
+   private EncryptUtil encryptUtil;
+   private static final Logger logger = LoggerFactory.getLogger(MasterKeyService.class);
+
+   public SecretController() throws FileNotFoundException {
+      encryptUtil = new EncryptUtil(masterKeyService.getMasterKey());
+   }
 
    // create secret REST API
    @CrossOrigin(origins = "${CROSS_ORIGIN}")
@@ -58,11 +70,18 @@ public class SecretController {
       User user = userService.findByEmail(newSecret.getEmail());
 
       //transfer secret and encrypt content
-      Secret secret = new Secret(
-            null,
-            user.getId(),
-            new EncryptUtil(newSecret.getEncryptPassword()).encrypt(newSecret.getContent().toString())
-      );
+      Secret secret;
+      try{
+         secret = new Secret(
+                 null,
+                 user.getId(),
+                 encryptUtil.encrypt(newSecret.getContent().toString())
+         );
+      }
+      catch (Exception e){
+         logger.error(e.getMessage());
+         return ResponseEntity.internalServerError().body("Internal Server Error (500)");
+      }
       //save secret in db
       secretService.createSecret(secret);
       System.out.println("SecretController.createSecret, secret saved in db");
@@ -87,7 +106,7 @@ public class SecretController {
       //Decrypt content
       for(Secret secret: secrets) {
          try {
-            secret.setContent(new EncryptUtil(credentials.getEncryptPassword()).decrypt(secret.getContent()));
+            secret.setContent(encryptUtil.decrypt(secret.getContent()));
          } catch (EncryptionOperationNotPossibleException e) {
             System.out.println("SecretController.getSecretsByUserId " + e + " " + secret);
             secret.setContent("not encryptable. Wrong password?");
@@ -114,7 +133,7 @@ public class SecretController {
       //Decrypt content
       for(Secret secret: secrets) {
          try {
-            secret.setContent(new EncryptUtil(credentials.getEncryptPassword()).decrypt(secret.getContent()));
+            secret.setContent(encryptUtil.decrypt(secret.getContent()));
          } catch (EncryptionOperationNotPossibleException e) {
             System.out.println("SecretController.getSecretsByEmail " + e + " " + secret);
             secret.setContent("not encryptable. Wrong password?");
@@ -182,7 +201,7 @@ public class SecretController {
       }
       //check if Secret can be decrypted with password
       try {
-         new EncryptUtil(newSecret.getEncryptPassword()).decrypt(dbSecrete.getContent());
+         encryptUtil.decrypt(dbSecrete.getContent());
       } catch (EncryptionOperationNotPossibleException e) {
          System.out.println("SecretController.updateSecret, invalid password");
          JsonObject obj = new JsonObject();
@@ -195,7 +214,7 @@ public class SecretController {
       Secret secret = new Secret(
             secretId,
             user.getId(),
-            new EncryptUtil(newSecret.getEncryptPassword()).encrypt(newSecret.getContent().toString())
+            encryptUtil.encrypt(newSecret.getContent().toString())
       );
       Secret updatedSecret = secretService.updateSecret(secret);
       //save secret in db
