@@ -113,3 +113,16 @@ Ich habe mit Java-Libraries eine Encryption (und Decryption) mit Private- und Pu
 Den Master-Key (Private-Key) lade ich von der Festplatte, ausserhalb des Repositories, weil geheime Infos innerhalb eines Repos immer heikel sind. 
 
 Ich verwende für jedes Secret einen Salt. Ich encrypte ihn nur und speichere ihn nirgends ab. Ich encrypte nicht wie das Passwort, sondern ich setze noch ein `$` zwischen Salt und Secret, um den Salt vom Secret unterscheiden zu können.
+
+## Regist, Password, Captcha
+
+### Informieren
+Oft werden bei Passwort-Validation auf folgende Sachen geachtet: 
+- Länge des Passworts (mind. 8)
+- Grossbuchstaben
+- Kleinbuchstaben
+- Zahlen
+
+Diese Sachen werden oft mit Regex überprüft.
+
+### Umsetzen
