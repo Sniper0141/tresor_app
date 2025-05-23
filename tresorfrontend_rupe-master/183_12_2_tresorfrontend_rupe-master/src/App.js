@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import './App.css';
 import './css/mvp.css';
