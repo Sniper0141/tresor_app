@@ -59,7 +59,7 @@ export const postUser = async (content) => {
 
         if(response.status === 400){
             console.log('Registration failed (400):', response);
-            return response;
+            return response.json();
         }
 
         if (!response.ok) {

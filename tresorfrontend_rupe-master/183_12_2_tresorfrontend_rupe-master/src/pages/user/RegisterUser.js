@@ -41,7 +41,7 @@ function RegisterUser({loginValues, setLoginValues}) {
         }
 
         if(response){
-            setErrorMessage(response);
+            setErrorMessage(response.answer);
             return;
         }
 
