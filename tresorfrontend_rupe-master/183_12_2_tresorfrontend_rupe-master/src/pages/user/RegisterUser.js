@@ -115,6 +115,7 @@ function RegisterUser({loginValues, setLoginValues}) {
                         </div>
                     </aside>
                 </section>
+                <div class="g-recaptcha" data-sitekey="6LdCAlcrAAAAACYMlwM3o7yjKG2xQ0_3KDKYvixQ"></div>
                 <button type="submit">Register</button>
                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
             </form>
