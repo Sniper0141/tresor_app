@@ -125,5 +125,19 @@ Oft werden bei Passwort-Validation auf folgende Sachen geachtet:
 
 Diese Sachen werden oft mit Regex überprüft.
 
-### Umsetzen
+### Umsetzen (Password)
 Die nicht abgedeckten Anforderungs werden dem User in Rot angezeigt, nachdem er das Formular abgeschickt hat. 
+
+### Informieren (Captcha)
+"reCAPTCHA v2" ist von Google entwickelt. Es gibt dem User einfache Aufgaben, um zu bestätigen dass er ein Mensch ist.  
+Sprich: Es ist das gewöhnliche Captcha, das man auf fast jeder Website gesehen hat, bis v3 herausgekommen ist.
+
+### Umsetzen (Captcha)
+Auf der Seite von [reCAPTCHA](https://cloud.google.com/security/products/recaptcha?hl=de) kann man einfach ein Captcha erstellen. Dabei bekommt man folgende Keys: 
+
+"Site Key": `6LdCAlcrAAAAACYMlwM3o7yjKG2xQ0_3KDKYvixQ`
+"Secret Key": `6LdCAlcrAAAAAL01IO4CaEAK46KG1_FnbT2XcIW6`
+
+Im Frontend kann man ein [JS-File laden](https://developers.google.com/recaptcha/docs/display?hl=de#auto_render) und ein HTML-Element mit dem Site-Key ins HTML einfügen.
+
+Im Backend braucht es 
