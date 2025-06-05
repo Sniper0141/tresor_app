@@ -116,7 +116,7 @@ Ich verwende für jedes Secret einen Salt. Ich encrypte ihn nur und speichere ih
 
 ## Regist, Password, Captcha
 
-### Informieren
+### Informieren (Password)
 Oft werden bei Passwort-Validation auf folgende Sachen geachtet: 
 - Länge des Passworts (mind. 8)
 - Grossbuchstaben
@@ -126,3 +126,4 @@ Oft werden bei Passwort-Validation auf folgende Sachen geachtet:
 Diese Sachen werden oft mit Regex überprüft.
 
 ### Umsetzen
+Die nicht abgedeckten Anforderungs werden dem User in Rot angezeigt, nachdem er das Formular abgeschickt hat. 
