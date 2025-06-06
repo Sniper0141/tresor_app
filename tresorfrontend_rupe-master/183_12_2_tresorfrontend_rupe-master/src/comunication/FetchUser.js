@@ -34,7 +34,7 @@ export const getUsers = async () => {
     }
 }
 
-export const postUser = async (content) => {
+export const postUser = async (credentials, captchaToken) => {
     const protocol = process.env.REACT_APP_API_PROTOCOL; // "http"
     const host = process.env.REACT_APP_API_HOST; // "localhost"
     const port = process.env.REACT_APP_API_PORT; // "8080"
@@ -49,11 +49,12 @@ export const postUser = async (content) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                firstName: `${content.firstName}`,
-                lastName: `${content.lastName}`,
-                email: `${content.email}`,
-                password: `${content.password}`,
-                passwordConfirmation: `${content.passwordConfirmation}`
+                firstName: `${credentials.firstName}`,
+                lastName: `${credentials.lastName}`,
+                email: `${credentials.email}`,
+                password: `${credentials.password}`,
+                passwordConfirmation: `${credentials.passwordConfirmation}`,
+                recaptchaToken: `${captchaToken}`
             })
         });
 
