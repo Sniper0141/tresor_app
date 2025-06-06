@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {postUser} from "../../comunication/FetchUser";
+import { postUser } from "../../comunication/FetchUser";
+import ReCAPTCHA from "react-google-recaptcha";
 
 /**
  * RegisterUser
@@ -31,9 +32,12 @@ function RegisterUser({loginValues, setLoginValues}) {
             return;
         }
 
+        // captcha
+        const captchaToken = ReCAPTCHA.getResponse();
+
         let response;
         try {
-            response = await postUser(credentials);
+            response = await postUser(credentials, captchaToken);
         } catch (error) {
             console.error('Failed to fetch to server:', error.message);
             setErrorMessage(error.message);
