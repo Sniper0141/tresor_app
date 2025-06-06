@@ -16,9 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -92,11 +94,6 @@ public class UserController {
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PostMapping
     public ResponseEntity<String> createUser(@Valid @RequestBody RegisterUser registerUser, BindingResult bindingResult) throws NoSuchAlgorithmException {
-        //captcha
-        //todo ergänzen
-
-        System.out.println("UserController.createUser: captcha passed.");
-
         //input validation
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
@@ -118,6 +115,23 @@ public class UserController {
         }
 
         System.out.println("UserController.createUser, password validation passed");
+
+        // captcha validation
+        var recaptchaSecret = "6LdCAlcrAAAAAL01IO4CaEAK46KG1_FnbT2XcIW6";
+        var VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
+
+        var restTemplate = new RestTemplate();
+        var url = VERIFY_URL + "?secret=" + recaptchaSecret + "&response=" + registerUser.getRecaptchaToken();
+
+        Map<String, Object> response = restTemplate.postForObject(url, null, Map.class);
+        if(!(Boolean)response.get("success")){
+            JsonObject obj = new JsonObject();
+            obj.addProperty("answer", "Captcha needs to be verified.");
+            String json = new Gson().toJson(obj);
+            return ResponseEntity.badRequest().body(json);
+        }
+        System.out.println("UserController.createUser: captcha passed.");
+
 
         //transform registerUser to user
         User user = new User(
