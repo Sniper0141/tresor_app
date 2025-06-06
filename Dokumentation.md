@@ -140,4 +140,5 @@ Auf der Seite von [reCAPTCHA](https://cloud.google.com/security/products/recaptc
 
 Im Frontend kann man ein [JS-File laden](https://developers.google.com/recaptcha/docs/display?hl=de#auto_render) und ein HTML-Element mit dem Site-Key ins HTML einfügen.
 
-Im Backend braucht es 
+Das Backend erhält dann vom Frontend (im POST-Request zum Registrieren) das Captcha-Token und validiert dieses mit dem Google API.
+Das Token war schon ein Property in der Request-Klasse, ich habe es noch required gemacht.
