@@ -58,18 +58,17 @@ export const postUser = async (credentials, captchaToken) => {
             })
         });
 
-        if(response.status === 400){
-            console.log('Registration failed (400):', response);
-            return response.json();
+        const body = await response.json();
+        
+        console.log(body);
+
+        if(body !== ""){
+            console.log('Registration failed: ', body);
+            return body;
         }
 
-        if (!response.ok) {
-            const responseJson = await response.json();
-            throw new Error(responseJson.answer || 'Server response failed.');
-        }
-        const data = await response.json();
-        console.log('User successfully posted:', data);
-        return data;
+        console.log('User successfully posted:', body);
+        return body;
     } catch (error) {
         console.error('Failed to post user:', error.message);
         throw new Error('Failed to save user. ' || error.message);

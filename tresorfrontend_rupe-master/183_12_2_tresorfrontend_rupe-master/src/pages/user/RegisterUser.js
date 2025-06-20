@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postUser } from "../../comunication/FetchUser";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -8,6 +8,8 @@ import ReCAPTCHA from "react-google-recaptcha";
  * @author Peter Rutschmann
  */
 function RegisterUser({loginValues, setLoginValues}) {
+    const recaptchaRef = useRef();
+
     const navigate = useNavigate();
 
     const initialState = {
@@ -19,6 +21,7 @@ function RegisterUser({loginValues, setLoginValues}) {
         errorMessage: ""
     };
     const [credentials, setCredentials] = useState(initialState);
+    const [captchaToken, setCaptchaToken] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async (e) => {
@@ -31,9 +34,11 @@ function RegisterUser({loginValues, setLoginValues}) {
             setErrorMessage('Password and password-confirmation are not equal.');
             return;
         }
-
-        // captcha
-        const captchaToken = ReCAPTCHA.getResponse();
+        if(captchaToken === null){
+            console.log('Captcha not completed...');
+            setErrorMessage('Please complete the Captcha.');
+            return;
+        }
 
         let response;
         try {
@@ -119,7 +124,19 @@ function RegisterUser({loginValues, setLoginValues}) {
                         </div>
                     </aside>
                 </section>
-                <div className="g-recaptcha" data-sitekey="6LdCAlcrAAAAACYMlwM3o7yjKG2xQ0_3KDKYvixQ"></div>
+                <ReCAPTCHA
+                            ref={recaptchaRef}
+                            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                            onChange={(token) => {
+                                setCaptchaToken(token);
+                            }}
+                            onExpired={() => {
+                                setCaptchaToken(null);
+                            }}
+                            onError={() => {
+                                setCaptchaToken(null);
+                            }}
+                        />
                 <button type="submit">Register</button>
                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
             </form>
