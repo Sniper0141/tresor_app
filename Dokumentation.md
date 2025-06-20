@@ -142,3 +142,6 @@ Im Frontend kann man ein [JS-File laden](https://developers.google.com/recaptcha
 
 Das Backend erhält dann vom Frontend (im POST-Request zum Registrieren) das Captcha-Token und validiert dieses mit dem Google API.
 Das Token war schon ein Property in der Request-Klasse, ich habe es noch required gemacht.
+
+[Google reCAPTCHA](https://www.google.com/recaptcha/admin/site/727122498/setup)
+
