@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -90,6 +91,9 @@ public class UserController {
         return ResponseEntity.ok().body(responseBody);
     }
 
+    @Value("${RECAPTCHA_PRIVATE_KEY}")
+    private String reCaptchaPrivateKey;
+
     // build create User REST API
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PostMapping
@@ -117,11 +121,16 @@ public class UserController {
         System.out.println("UserController.createUser, password validation passed");
 
         // captcha validation
-        var recaptchaSecret = "6LdCAlcrAAAAAL01IO4CaEAK46KG1_FnbT2XcIW6";
-        var VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
+        if(reCaptchaPrivateKey == null){
+            JsonObject obj = new JsonObject();
+            obj.addProperty("answer", "Unexpected Server Error");
+            String json = new Gson().toJson(obj);
 
+            return ResponseEntity.badRequest().body(json);
+        }
+        var VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
         var restTemplate = new RestTemplate();
-        var url = VERIFY_URL + "?secret=" + recaptchaSecret + "&response=" + registerUser.getRecaptchaToken();
+        var url = VERIFY_URL + "?secret=" + reCaptchaPrivateKey + "&response=" + registerUser.getRecaptchaToken();
 
         Map<String, Object> response = restTemplate.postForObject(url, null, Map.class);
         if(!(Boolean)response.get("success")){
@@ -149,11 +158,7 @@ public class UserController {
         }
 
         System.out.println("UserController.createUser, user saved in db");
-        JsonObject obj = new JsonObject();
-        obj.addProperty("answer", "User Saved");
-        String json = new Gson().toJson(obj);
-        System.out.println("UserController.createUser " + json);
-        return ResponseEntity.accepted().body(json);
+        return ResponseEntity.accepted().body("");
     }
 
     // build get user by id REST API
