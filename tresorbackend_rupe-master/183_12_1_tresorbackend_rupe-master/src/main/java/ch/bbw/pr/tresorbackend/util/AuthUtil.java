@@ -19,11 +19,13 @@ public class AuthUtil {
     }
 
     public String generateJWT(String email, String password, Role role) throws NoSuchAlgorithmException {
+        long unixTime = System.currentTimeMillis() / 1000L;
         return JWT.create()
                 .withIssuer("auth0")
                 .withClaim("sub", email)
                 .withClaim("password", password)
                 .withClaim("role", role.toString())
+                .withClaim("iat", unixTime)
                 .sign(algorithm);
     }
 
