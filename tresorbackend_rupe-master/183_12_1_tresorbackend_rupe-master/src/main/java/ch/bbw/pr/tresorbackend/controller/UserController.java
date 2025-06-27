@@ -4,6 +4,7 @@ import ch.bbw.pr.tresorbackend.model.*;
 import ch.bbw.pr.tresorbackend.service.PasswordEncryptionService;
 import ch.bbw.pr.tresorbackend.service.UserService;
 
+import ch.bbw.pr.tresorbackend.util.AuthUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -86,9 +88,8 @@ public class UserController {
         }
 
         logger.info("UserController.doLoginUser: Login passed");
-        var responseObj = new LoginResponse("Login successful.", user.getId());
-        var responseBody = new Gson().toJson(responseObj);
-        return ResponseEntity.ok().body(responseBody);
+
+        return getValidLoginResponse(loginUser, user);
     }
 
     @Value("${RECAPTCHA_PRIVATE_KEY}")
@@ -267,5 +268,36 @@ public class UserController {
         var response = new LoginResponse("Email or password incorrect.", userId);
         var responseJson = new Gson().toJson(response);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseJson);
+    }
+
+    private ResponseEntity<String> getValidLoginResponse(LoginUser loginUser, User user){
+        AuthUtil authUtil;
+        try{
+            authUtil = new AuthUtil();
+        }
+        catch(Exception e){
+            logger.error("UserController.doLoginUser: AuthUtil exception: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body("Something went wrong");
+        }
+
+        AuthUtil.Role role = loginUser.getEmail().equalsIgnoreCase("said.simokovic@digitecgalaxus.ch")
+                ? AuthUtil.Role.Admin
+                : AuthUtil.Role.User;
+
+        String jwt;
+        try{
+            jwt = authUtil.generateJWT(loginUser.getEmail(), loginUser.getPassword(), role);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("UserController.doLoginUser: Failed to generate JWT. {}", e.getMessage());
+            return ResponseEntity.internalServerError().body("Something went wrong");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Set-Cookie", "token=" + jwt + "; Path=/; HttpOnly; Secure; SameSite=Strict");
+
+        var responseObj = new LoginResponse("Login successful.", user.getId());
+        var responseBody = new Gson().toJson(responseObj);
+
+        return ResponseEntity.ok().headers(headers).body(responseBody);
     }
 }
