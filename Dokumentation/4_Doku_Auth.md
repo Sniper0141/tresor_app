@@ -9,7 +9,7 @@
 - Es werden mindestens zwei Rollen (Admin, User) unterschieden.
 - Es sind abhängig von den Rollen unterschiedliche Autorisation vorhanden.
 
-### JWT
+### JWT Authentication
 
 Das JWT (JSON Web Token) wird für die autorisierung von Benutzern gebraucht.
 
@@ -28,4 +28,15 @@ Das JWT (JSON Web Token) wird für die autorisierung von Benutzern gebraucht.
 > - **JWT Signature Verification**: Der Key der für die Singatur des Token verwendet wird. Damit wird verhindert, dass JWTs gefaked werden können.
 
 Der Dritte Teil besteht aus dem ersten und dem zweiten Teil, enkodiert und signiert mit dem geheimen Key.
+
+### Basic Authentication
+
+Enkodierte Credentials, die (Base64-enkodiert) in den "Authorization"-Header im HTTP-Request geschrieben werden: 
+
+**Beispiel-Credentials**: `Username:Password` -> `VXNlcm5hbWU6UGFzc3dvcmQ=`  
+**Authorization Header**: `Basic VXNlcm5hbWU6UGFzc3dvcmQ=`
+
+### Rollenbasierte Autorisierung
+
+Im Payload des JWT kann die Rolle als ein Feld mitgegeben werden. Der Server kann dann anhand der Rolle (verfälschung durch Signierung des JWT ausgeschlossen) prüfen, ob der Nutzer die nötige Autorität zur Ressource hat.
 
