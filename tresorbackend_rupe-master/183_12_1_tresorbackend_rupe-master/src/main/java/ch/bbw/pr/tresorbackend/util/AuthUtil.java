@@ -21,7 +21,7 @@ public class AuthUtil {
     public String generateJWT(String email, String password, Role role) throws NoSuchAlgorithmException {
         return JWT.create()
                 .withIssuer("auth0")
-                .withClaim("email", email)
+                .withClaim("sub", email)
                 .withClaim("password", password)
                 .withClaim("role", role.toString())
                 .sign(algorithm);
