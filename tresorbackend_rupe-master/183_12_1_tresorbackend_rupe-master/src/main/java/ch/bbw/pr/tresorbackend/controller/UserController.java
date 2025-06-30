@@ -54,7 +54,14 @@ public class UserController {
 
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PostMapping("login")
-    public ResponseEntity<String> doLoginUser(@RequestBody LoginUser loginUser, BindingResult bindingResult) throws NoSuchAlgorithmException {
+    public ResponseEntity<String> doLoginUser(
+            @RequestBody LoginUser loginUser,
+            @CookieValue(name = "jwt", required = false) String jwtToken,
+            BindingResult bindingResult)
+        throws NoSuchAlgorithmException {
+        //validate-jwt
+
+
         //input validation
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
