@@ -304,7 +304,7 @@ public class UserController {
             return ResponseEntity.internalServerError().body("Something went wrong");
         }
 
-        HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
         headers.add("Set-Cookie", "token=" + jwt + "; Path=/; HttpOnly; Secure; SameSite=Strict");
 
         var responseObj = new LoginResponse("Login successful.", user.getId());
