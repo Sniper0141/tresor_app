@@ -1,7 +1,10 @@
 package ch.bbw.pr.tresorbackend.util;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.google.gson.Gson;
+
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -29,8 +32,17 @@ public class AuthUtil {
                 .sign(algorithm);
     }
 
+    public Payload getPayloadFromJWT(String jwt) {
+        JWTVerifier verifier = JWT.require(algorithm).withIssuer("auth0").build();
+        var decodedJWT = verifier.verify(jwt);
+        var payloadStr = decodedJWT.getPayload();
+        return new Gson().fromJson(payloadStr, Payload.class);
+    }
+
     public enum Role{
         User,
         Admin
     }
+
+    public record Payload(String sub, String password, String role, String iat) {}
 }
