@@ -5,6 +5,8 @@ import ch.bbw.pr.tresorbackend.service.PasswordEncryptionService;
 import ch.bbw.pr.tresorbackend.service.UserService;
 
 import ch.bbw.pr.tresorbackend.util.AuthUtil;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
