@@ -56,11 +56,11 @@ public class UserController {
     @PostMapping("login")
     public ResponseEntity<String> doLoginUser(
             @RequestBody LoginUser loginUser,
-            @CookieValue(name = "jwt", required = false) String jwtToken,
+            @CookieValue(name = "jwt", required = false) String jwt,
             BindingResult bindingResult)
         throws NoSuchAlgorithmException {
         //validate-jwt
-
+        
 
         //input validation
         if (bindingResult.hasErrors()) {
