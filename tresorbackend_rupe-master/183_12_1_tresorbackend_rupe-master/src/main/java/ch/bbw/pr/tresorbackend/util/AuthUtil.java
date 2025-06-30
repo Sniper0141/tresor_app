@@ -32,7 +32,7 @@ public class AuthUtil {
                 .sign(algorithm);
     }
 
-    public Payload getPayloadFromJWT(String jwt) {
+    public Payload getPayloadAndVerifyJWT(String jwt) {
         JWTVerifier verifier = JWT.require(algorithm).withIssuer("auth0").build();
         var decodedJWT = verifier.verify(jwt);
         var payloadStr = decodedJWT.getPayload();
