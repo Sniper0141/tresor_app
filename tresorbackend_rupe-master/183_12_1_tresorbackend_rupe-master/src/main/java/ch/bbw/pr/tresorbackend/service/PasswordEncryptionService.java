@@ -4,7 +4,6 @@ import com.google.common.hash.Hashing;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
@@ -19,12 +18,12 @@ public class PasswordEncryptionService {
    public PasswordEncryptionService() {}
 
 
-   public String encryptPassword(String password) throws NoSuchAlgorithmException {
+   public String encryptPassword(String password) {
       var salt = generateSalt();
       return encryptPassword(password, salt);
    }
 
-   public String encryptPassword(String password, String salt) throws NoSuchAlgorithmException {
+   public String encryptPassword(String password, String salt) {
       var seasonedPassword = pepper + salt + password;
       String hashedPassword = Hashing.sha256()
               .hashString(seasonedPassword, StandardCharsets.UTF_8)
@@ -33,7 +32,7 @@ public class PasswordEncryptionService {
       return salt + "$" + hashedPassword;
    }
 
-   public boolean doPasswordsMatch(String password, String hashedPassword) throws NoSuchAlgorithmException {
+   public boolean doPasswordsMatch(String password, String hashedPassword) {
       var salt = getSaltFromHashedPassword(hashedPassword);
       var hashedVerifyingPassword = encryptPassword(password, salt);
 
