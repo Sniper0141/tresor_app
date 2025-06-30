@@ -64,7 +64,7 @@ public class UserController {
             @CookieValue(name = "jwt", required = false) String jwt,
             BindingResult bindingResult) {
         //validate-jwt
-        var statusCode = validateJwt(jwt, false, null, true);
+        var statusCode = validateJwt(jwt, false, null);
         if(statusCode != null){
             return ResponseEntity.status(statusCode).body(null);
         }
