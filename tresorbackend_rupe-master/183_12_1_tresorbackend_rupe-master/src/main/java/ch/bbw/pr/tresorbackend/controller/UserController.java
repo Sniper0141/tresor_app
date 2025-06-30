@@ -62,7 +62,6 @@ public class UserController {
             BindingResult bindingResult) {
         //validate-jwt
 
-
         //input validation
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
@@ -294,7 +293,7 @@ public class UserController {
 
         String jwt;
         try{
-            jwt = authUtil.generateJWT(loginUser.getEmail(), loginUser.getPassword(), role);
+            jwt = authUtil.generateJWT(loginUser.getEmail(), role);
         } catch (NoSuchAlgorithmException | JWTCreationException e) {
             logger.error("UserController.doLoginUser: Failed to generate JWT. {}", e.getMessage());
             return ResponseEntity.internalServerError().body("Something went wrong");

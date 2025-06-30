@@ -21,22 +21,21 @@ public class AuthUtil {
         algorithm = Algorithm.RSA256(publicKey, privateKey);
     }
 
-    public String generateJWT(String email, String password, Role role) throws NoSuchAlgorithmException {
+    public String generateJWT(String email, Role role) throws NoSuchAlgorithmException {
         long unixTime = System.currentTimeMillis() / 1000L;
         return JWT.create()
                 .withIssuer("auth0")
                 .withClaim("sub", email)
-                .withClaim("password", password)
                 .withClaim("role", role.toString())
                 .withClaim("iat", unixTime)
                 .sign(algorithm);
     }
 
-    public Payload getPayloadAndVerifyJWT(String jwt) {
+    public JwtPayload getPayloadAndVerifyJWT(String jwt) {
         JWTVerifier verifier = JWT.require(algorithm).withIssuer("auth0").build();
         var decodedJWT = verifier.verify(jwt);
         var payloadStr = decodedJWT.getPayload();
-        return new Gson().fromJson(payloadStr, Payload.class);
+        return new Gson().fromJson(payloadStr, JwtPayload.class);
     }
 
     public enum Role{
@@ -44,5 +43,5 @@ public class AuthUtil {
         Admin
     }
 
-    public record Payload(String sub, String password, String role, String iat) {}
+    public record JwtPayload(String sub, String role, String iat) {}
 }
