@@ -293,7 +293,7 @@ public class UserController {
         String jwt;
         try{
             jwt = authUtil.generateJWT(loginUser.getEmail(), loginUser.getPassword(), role);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | JWTCreationException e) {
             logger.error("UserController.doLoginUser: Failed to generate JWT. {}", e.getMessage());
             return ResponseEntity.internalServerError().body("Something went wrong");
         }
