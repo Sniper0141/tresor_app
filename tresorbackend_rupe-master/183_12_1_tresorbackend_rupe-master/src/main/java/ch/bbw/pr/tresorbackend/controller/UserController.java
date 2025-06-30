@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +25,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -89,14 +86,14 @@ public class UserController {
         var user = userService.findByEmail(loginUser.getEmail());
         if(user == null){
             logger.info("UserController.doLoginUser: User not found with email: " + loginUser.getEmail());
-            return GetWrongEmailOrPasswordResponse(0);
+            return getWrongEmailOrPasswordResponse(0);
         }
 
         var actualPassword = user.getPassword();
         var loginPassword = loginUser.getPassword();
         if(!passwordService.doPasswordsMatch(loginPassword, actualPassword)){
             logger.info("UserController.doLoginUser: Passwords do not match");
-            return GetWrongEmailOrPasswordResponse(user.getId());
+            return getWrongEmailOrPasswordResponse(user.getId());
         }
 
         logger.info("UserController.doLoginUser: Login passed");
@@ -276,7 +273,7 @@ public class UserController {
         return errorString;
     }
 
-    private ResponseEntity<String> GetWrongEmailOrPasswordResponse(long userId){
+    private ResponseEntity<String> getWrongEmailOrPasswordResponse(long userId){
         var response = new LoginResponse("Email or password incorrect.", userId);
         var responseJson = new Gson().toJson(response);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseJson);
