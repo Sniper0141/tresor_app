@@ -18,14 +18,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -306,5 +311,48 @@ public class UserController {
         var responseBody = new Gson().toJson(responseObj);
 
         return ResponseEntity.ok().headers(headers).body(responseBody);
+    }
+
+    private ResponseEntity<String> validateJwt(String jwt, boolean adminNeeded){
+
+        if(jwt == null || jwt.isEmpty()){
+            return null;
+        }
+
+        AuthUtil.JwtPayload jwtPayload;
+        try{
+            var authUtil = new AuthUtil();
+            jwtPayload = authUtil.getPayloadAndVerifyJWT(jwt);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.internalServerError().body("Something went wrong");
+        } catch (JWTVerificationException e){
+            logger.warn("This JWT is not valid...");
+            return null;
+        }
+
+        // Check if expired
+        try{
+            var issuedAt = Integer.parseInt(jwtPayload.iat());
+            var epochSecondsYesterday = Instant.now().minusSeconds(86400).getEpochSecond();
+
+            if(issuedAt < epochSecondsYesterday){
+                logger.warn("JWT is expired.");
+                return null;
+            }
+        }
+        catch(NumberFormatException e){
+            logger.error(e.getMessage());
+            return null;
+        }
+
+        // check admin
+        if(adminNeeded){
+            return Objects.equals(jwtPayload.role(), "admin")
+                    ? ResponseEntity.status(403).body("Forbidden")
+                    : null;
+        }
+
+        return null;
     }
 }
