@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -63,6 +64,10 @@ public class UserController {
             @CookieValue(name = "jwt", required = false) String jwt,
             BindingResult bindingResult) {
         //validate-jwt
+        var statusCode = validateJwt(jwt, false, null, true);
+        if(statusCode != null){
+            return ResponseEntity.status(statusCode).body(null);
+        }
 
         //input validation
         if (bindingResult.hasErrors()) {
@@ -107,7 +112,13 @@ public class UserController {
     // build create User REST API
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PostMapping
-    public ResponseEntity<String> createUser(@Valid @RequestBody RegisterUser registerUser, BindingResult bindingResult) throws NoSuchAlgorithmException {
+    public ResponseEntity<String> createUser(@Valid @RequestBody RegisterUser registerUser, @CookieValue(name = "jwt", required = false) String jwt, BindingResult bindingResult) {
+        //validate-jwt
+        var statusCode = validateJwt(jwt, false, null);
+        if(statusCode != null && statusCode != 200){
+            return ResponseEntity.status(statusCode).body(null);
+        }
+
         //input validation
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
@@ -168,14 +179,20 @@ public class UserController {
         }
 
         System.out.println("UserController.createUser, user saved in db");
-        return ResponseEntity.accepted().body("");
+        return ResponseEntity.accepted().body(null);
     }
 
     // build get user by id REST API
     // http://localhost:8080/api/users/1
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @GetMapping("{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long userId) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") Long userId, @CookieValue(name = "jwt", required = false) String jwt) {
+        //validate-jwt
+        var statusCode = validateJwt(jwt, false, null);
+        if(statusCode != null && statusCode != 200){
+            return ResponseEntity.status(statusCode).body(null);
+        }
+
         User user = userService.getUserById(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -184,7 +201,13 @@ public class UserController {
     // http://localhost:8080/api/users
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<User>> getAllUsers(@CookieValue(name = "jwt", required = false) String jwt) {
+        //validate-jwt
+        var statusCode = validateJwt(jwt, true, null);
+        if(statusCode != null && statusCode != 200){
+            return ResponseEntity.status(statusCode).body(null);
+        }
+
         List<User> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -193,16 +216,34 @@ public class UserController {
     // http://localhost:8080/api/users/1
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PutMapping("{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") Long userId, @RequestBody User user) {
+    public ResponseEntity<String> updateUser(
+            @PathVariable("id") Long userId,
+            @RequestBody User user,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        //validate-jwt
+        var statusCode = validateJwt(jwt, false, user.getEmail());
+        if(statusCode != null && statusCode != 200){
+            return ResponseEntity.status(statusCode).body(null);
+        }
+
         user.setId(userId);
         User updatedUser = userService.updateUser(user);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        return new ResponseEntity<>(updatedUser.toString(), HttpStatus.OK);
     }
 
     // Build Delete User REST API
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId) {
+    public ResponseEntity<String> deleteUser(
+            @PathVariable("id") Long userId,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        //validate-jwt
+        var user = userService.getUserById(userId);
+        var statusCode = validateJwt(jwt, false, user.getEmail());
+        if(statusCode != null && statusCode != 200){
+            return ResponseEntity.status(statusCode).body(null);
+        }
+
         userService.deleteUser(userId);
         return new ResponseEntity<>("User successfully deleted!", HttpStatus.OK);
     }
@@ -211,7 +252,16 @@ public class UserController {
     // get user id by email
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @PostMapping("/byemail")
-    public ResponseEntity<String> getUserIdByEmail(@RequestBody EmailAdress email, BindingResult bindingResult) {
+    public ResponseEntity<String> getUserIdByEmail(
+            @RequestBody EmailAdress email,
+            @CookieValue(name = "jwt", required = false) String jwt,
+            BindingResult bindingResult) {
+        //validate-jwt
+        var statusCode = validateJwt(jwt, true, null);
+        if(statusCode != null && statusCode != 200){
+            return ResponseEntity.status(statusCode).body(null);
+        }
+
         System.out.println("UserController.getUserIdByEmail: " + email);
         //input validation
         if (bindingResult.hasErrors()) {
@@ -310,8 +360,7 @@ public class UserController {
         return ResponseEntity.ok().headers(headers).body(responseBody);
     }
 
-    private ResponseEntity<String> validateJwt(String jwt, boolean adminNeeded){
-
+    private Integer validateJwt(String jwt, boolean adminNeeded, String needsToBeUser){
         if(jwt == null || jwt.isEmpty()){
             return null;
         }
@@ -322,10 +371,10 @@ public class UserController {
             jwtPayload = authUtil.getPayloadAndVerifyJWT(jwt);
         } catch (NoSuchAlgorithmException e) {
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("Something went wrong");
+            return 500;
         } catch (JWTVerificationException e){
             logger.warn("This JWT is not valid...");
-            return null;
+            return 400;
         }
 
         // Check if expired
@@ -340,16 +389,23 @@ public class UserController {
         }
         catch(NumberFormatException e){
             logger.error(e.getMessage());
-            return null;
+            return 500;
         }
 
         // check admin
         if(adminNeeded){
-            return Objects.equals(jwtPayload.role(), "admin")
-                    ? ResponseEntity.status(403).body("Forbidden")
-                    : null;
+            return jwtPayload.role().equals("admin")
+                    ? null
+                    : 403;
         }
 
-        return null;
+        // check correct user
+        if(needsToBeUser != null){
+            return jwtPayload.sub().equalsIgnoreCase(needsToBeUser)
+                    ? null
+                    : 403;
+        }
+
+        return 200;
     }
 }
