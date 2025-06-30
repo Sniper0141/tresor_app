@@ -201,7 +201,7 @@ public class UserController {
     // http://localhost:8080/api/users
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(@CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<List<User>> getAllUsers(@CookieValue(name = "jwt") String jwt) {
         //validate-jwt
         var statusCode = validateJwt(jwt, true, null);
         if(statusCode != null && statusCode != 200){
@@ -219,7 +219,7 @@ public class UserController {
     public ResponseEntity<String> updateUser(
             @PathVariable("id") Long userId,
             @RequestBody User user,
-            @CookieValue(name = "jwt", required = false) String jwt) {
+            @CookieValue(name = "jwt") String jwt) {
         //validate-jwt
         var statusCode = validateJwt(jwt, false, user.getEmail());
         if(statusCode != null && statusCode != 200){
@@ -236,7 +236,7 @@ public class UserController {
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteUser(
             @PathVariable("id") Long userId,
-            @CookieValue(name = "jwt", required = false) String jwt) {
+            @CookieValue(name = "jwt") String jwt) {
         //validate-jwt
         var user = userService.getUserById(userId);
         var statusCode = validateJwt(jwt, false, user.getEmail());
@@ -254,7 +254,7 @@ public class UserController {
     @PostMapping("/byemail")
     public ResponseEntity<String> getUserIdByEmail(
             @RequestBody EmailAdress email,
-            @CookieValue(name = "jwt", required = false) String jwt,
+            @CookieValue(name = "jwt") String jwt,
             BindingResult bindingResult) {
         //validate-jwt
         var statusCode = validateJwt(jwt, true, null);
