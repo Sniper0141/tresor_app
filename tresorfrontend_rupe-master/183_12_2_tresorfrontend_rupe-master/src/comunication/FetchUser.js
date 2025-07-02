@@ -102,13 +102,9 @@ export const postLogin = async (content) => {
             return null;
         }
 
-        if(response.status === 401){
-            console.log('Login failed (401):', data);
-            return "Login failed.";
-        }
+        console.log('Login failed (401):', data);
+        return "Login failed.";
 
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Server response failed.');
     } catch (error) {
         console.error('Failed to post login:', error.message);
         throw new Error('Failed to do login. ' || error.message);
