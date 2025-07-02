@@ -25,10 +25,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -360,7 +358,7 @@ public class UserController {
         return ResponseEntity.ok().headers(headers).body(responseBody);
     }
 
-    private Integer validateJwt(String jwt, boolean adminNeeded, String needsToBeUser){
+    private Integer validateJwt(String jwt, boolean adminNeeded, String permittedUser){
         if(jwt == null || jwt.isEmpty()){
             return null;
         }
@@ -392,16 +390,16 @@ public class UserController {
             return 500;
         }
 
-        // check admin
-        if(adminNeeded){
-            return jwtPayload.role().equals("admin")
+        // check correct user
+        if(permittedUser != null){
+            return jwtPayload.sub().equalsIgnoreCase(permittedUser)
                     ? null
                     : 403;
         }
 
-        // check correct user
-        if(needsToBeUser != null){
-            return jwtPayload.sub().equalsIgnoreCase(needsToBeUser)
+        // check admin
+        if(adminNeeded){
+            return jwtPayload.role().equals("admin")
                     ? null
                     : 403;
         }
