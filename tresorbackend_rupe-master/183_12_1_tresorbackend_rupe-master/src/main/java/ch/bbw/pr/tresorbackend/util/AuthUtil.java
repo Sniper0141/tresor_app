@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Date;
 
 public class AuthUtil {
     private final Algorithm algorithm;
@@ -22,12 +23,11 @@ public class AuthUtil {
     }
 
     public String generateJWT(String email, Role role) throws NoSuchAlgorithmException {
-        long unixTime = System.currentTimeMillis() / 1000L;
         return JWT.create()
                 .withIssuer("auth0")
                 .withClaim("sub", email)
                 .withClaim("role", role.toString())
-                .withClaim("iat", ((Long)unixTime).toString())
+                .withClaim("iat", new Date())
                 .sign(algorithm);
     }
 
