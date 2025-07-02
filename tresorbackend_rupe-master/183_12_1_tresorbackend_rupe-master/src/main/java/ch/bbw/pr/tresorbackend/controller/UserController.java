@@ -337,7 +337,7 @@ public class UserController {
             return ResponseEntity.internalServerError().body("Something went wrong");
         }
 
-        var role = loginUser.getEmail().equalsIgnoreCase("said.simokovic@digitecgalaxus.ch")
+        var role = loginUser.getEmail().equalsIgnoreCase("admin@email.com")
                 ? AuthUtil.Role.Admin
                 : AuthUtil.Role.User;
 
