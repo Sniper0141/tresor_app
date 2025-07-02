@@ -27,7 +27,7 @@ public class AuthUtil {
                 .withIssuer("auth0")
                 .withClaim("sub", email)
                 .withClaim("role", role.toString())
-                .withClaim("iat", unixTime)
+                .withClaim("iat", ((Long)unixTime).toString())
                 .sign(algorithm);
     }
 

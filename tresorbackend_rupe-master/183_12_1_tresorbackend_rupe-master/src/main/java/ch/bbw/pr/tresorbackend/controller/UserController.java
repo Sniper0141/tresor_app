@@ -399,7 +399,7 @@ public class UserController {
 
         // check admin
         if(adminNeeded){
-            return jwtPayload.role().equals("admin")
+            return jwtPayload.role().equals("Admin")
                     ? null
                     : 403;
         }
