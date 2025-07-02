@@ -102,7 +102,7 @@ export const postLogin = async (content) => {
             return null;
         }
 
-        console.log('Login failed (401):', data);
+        console.log('Login failed:', data);
         return "Login failed.";
 
     } catch (error) {
