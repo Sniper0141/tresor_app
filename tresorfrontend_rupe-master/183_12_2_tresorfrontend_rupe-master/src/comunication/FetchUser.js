@@ -103,7 +103,7 @@ export const postLogin = async (content) => {
         }
 
         console.warn("Login didn't pass:", data);
-        return "Login failed.";
+        return "Login failed: " + data;
 
     } catch (error) {
         console.error('Failed to post login:', error.message);
