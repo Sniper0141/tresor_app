@@ -350,7 +350,7 @@ public class UserController {
         }
 
         var headers = new HttpHeaders();
-        headers.add("Set-Cookie", "token=" + jwt + "; Path=/; HttpOnly; Max-Age=86400");
+        headers.add("Set-Cookie", "jwt=" + jwt + "; Path=/; Max-Age=86400");
 
         var responseObj = new LoginResponse("Login successful.", user.getId());
         var responseBody = new Gson().toJson(responseObj);
