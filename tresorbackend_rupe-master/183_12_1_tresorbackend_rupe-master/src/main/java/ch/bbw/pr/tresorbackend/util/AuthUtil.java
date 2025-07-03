@@ -24,7 +24,7 @@ public class AuthUtil {
 
     public String generateJWT(String email, Role role) throws NoSuchAlgorithmException {
         return JWT.create()
-                .withIssuer("auth0")
+                .withIssuer("http://localhost:8080")
                 .withClaim("sub", email)
                 .withClaim("role", role.toString())
                 .withClaim("iat", new Date())
@@ -32,7 +32,7 @@ public class AuthUtil {
     }
 
     public JwtPayload getPayloadAndVerifyJWT(String jwt) {
-        JWTVerifier verifier = JWT.require(algorithm).withIssuer("auth0").build();
+        JWTVerifier verifier = JWT.require(algorithm).withIssuer("http://localhost:8080").build();
         var decodedJWT = verifier.verify(jwt);
         var payloadStr = decodedJWT.getPayload();
         return new Gson().fromJson(payloadStr, JwtPayload.class);
