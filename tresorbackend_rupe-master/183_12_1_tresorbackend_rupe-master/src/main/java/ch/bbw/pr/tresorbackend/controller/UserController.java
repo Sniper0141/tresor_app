@@ -64,7 +64,7 @@ public class UserController {
         //validate-jwt
         var statusCode = validateJwt(jwt, false, null);
         if(statusCode != null){
-            return ResponseEntity.status(statusCode).body(null);
+            return ResponseEntity.status(statusCode).body("{\n\t\"message\": \"JWT is invalid.\"\n}");
         }
 
         //input validation
@@ -322,7 +322,7 @@ public class UserController {
     }
 
     private ResponseEntity<String> getWrongEmailOrPasswordResponse(long userId){
-        var response = new LoginResponse("Email or password incorrect.", userId);
+        var response = new LoginResponse("Email or password incorrect.", userId, null);
         var responseJson = new Gson().toJson(response);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseJson);
     }
@@ -349,13 +349,10 @@ public class UserController {
             return ResponseEntity.internalServerError().body("Something went wrong");
         }
 
-        var headers = new HttpHeaders();
-        headers.add("Set-Cookie", "jwt=" + jwt + "; Path=/; Max-Age=86400");
-
-        var responseObj = new LoginResponse("Login successful.", user.getId());
+        var responseObj = new LoginResponse("Login successful.", user.getId(), jwt);
         var responseBody = new Gson().toJson(responseObj);
 
-        return ResponseEntity.ok().headers(headers).body(responseBody);
+        return ResponseEntity.ok().body(responseBody);
     }
 
     private Integer validateJwt(String jwt, boolean adminNeeded, String permittedUser){

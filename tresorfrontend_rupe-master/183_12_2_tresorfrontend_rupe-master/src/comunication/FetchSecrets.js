@@ -23,7 +23,8 @@ export const postSecret = async ({loginValues, content}) => {
                 email: loginValues.email,
                 encryptPassword: loginValues.password,
                 content: content
-            })
+            }),
+            credentials: "include"
         });
 
         if (!response.ok) {
@@ -58,7 +59,8 @@ export const getSecretsforUser = async (loginValues) => {
             body: JSON.stringify({
                 email: loginValues.email,
                 encryptPassword: loginValues.password
-            })
+            }),
+            credentials: "include"
         });
 
         if (!response.ok) {

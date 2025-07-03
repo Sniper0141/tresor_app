@@ -17,7 +17,8 @@ export const getUsers = async () => {
             method: 'Get',
             headers: {
                 'Accept': 'application/json'
-            }
+            },
+            credentials: "include"
         });
 
         if (!response.ok) {
@@ -55,7 +56,8 @@ export const postUser = async (credentials, captchaToken) => {
                 password: `${credentials.password}`,
                 passwordConfirmation: `${credentials.passwordConfirmation}`,
                 recaptchaToken: `${captchaToken}`
-            })
+            }),
+            credentials: "include"
         });
 
         const body = await response.json();
@@ -92,8 +94,10 @@ export const postLogin = async (content) => {
             body: JSON.stringify({
                 email: `${content.email}`,
                 password: `${content.password}`
-            })
+            }),
+            credentials: "include"
         });
+        console.log("RESPONSE CAME \n" + response)
 
         const data = await response.json();
 
