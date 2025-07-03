@@ -99,6 +99,7 @@ export const postLogin = async (content) => {
 
         if(response.status === 200){
             console.log('Login successfully posted:', data);
+            document.cookie = `jwt=${data.jwt}; Path=/; Max-Age=86400`
             return null;
         }
 
