@@ -4,22 +4,20 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.google.gson.Gson;
-
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 
 public class AuthUtil {
     private final Algorithm algorithm;
 
-    public AuthUtil() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(2048);
-        KeyPair keyPair = keyGen.generateKeyPair();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        algorithm = Algorithm.RSA256(publicKey, privateKey);
+    public AuthUtil(String publicKeyStr, String privateKeyStr) throws Exception {
+        System.out.println(publicKeyStr);
+        System.out.println(privateKeyStr);
+
+        var pubKey = KeyUtil.getPublicKeyFromString(publicKeyStr);
+        var privateKey = KeyUtil.getPrivateKeyFromString(privateKeyStr);
+
+        algorithm = Algorithm.RSA256(pubKey, privateKey);
     }
 
     public String generateJWT(String email, Role role) throws NoSuchAlgorithmException {

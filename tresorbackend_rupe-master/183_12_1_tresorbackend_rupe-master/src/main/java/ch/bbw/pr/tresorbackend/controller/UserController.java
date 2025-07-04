@@ -1,6 +1,7 @@
 package ch.bbw.pr.tresorbackend.controller;
 
 import ch.bbw.pr.tresorbackend.model.*;
+import ch.bbw.pr.tresorbackend.service.KeyService;
 import ch.bbw.pr.tresorbackend.service.PasswordEncryptionService;
 import ch.bbw.pr.tresorbackend.service.UserService;
 
@@ -42,10 +43,10 @@ public class UserController {
     private PasswordEncryptionService passwordService;
     private final ConfigProperties configProperties;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
+    private KeyService keyService;
 
     @Autowired
-    public UserController(ConfigProperties configProperties, UserService userService, PasswordEncryptionService passwordService) {
+    public UserController(ConfigProperties configProperties, UserService userService, PasswordEncryptionService passwordService, KeyService keyService) {
         this.configProperties = configProperties;
         System.out.println("UserController.UserController: cross origin: " + configProperties.getOrigin());
         // Logging in the constructor
@@ -330,7 +331,7 @@ public class UserController {
     private ResponseEntity<String> getValidLoginResponse(LoginUser loginUser, User user){
         AuthUtil authUtil;
         try{
-            authUtil = new AuthUtil();
+            authUtil = new AuthUtil(keyService.getPublicKey(), keyService.getPrivateKey());
         }
         catch(Exception e){
             logger.error("UserController.doLoginUser: AuthUtil exception: {}", e.getMessage());
@@ -362,14 +363,14 @@ public class UserController {
 
         AuthUtil.JwtPayload jwtPayload;
         try{
-            var authUtil = new AuthUtil();
+            var authUtil = new AuthUtil(keyService.getPublicKey(), keyService.getPrivateKey());
             jwtPayload = authUtil.getPayloadAndVerifyJWT(jwt);
-        } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage());
-            return 500;
         } catch (JWTVerificationException e){
             logger.warn("This JWT is not valid...");
             return 400;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return 500;
         }
 
         // Check if expired
