@@ -22,6 +22,7 @@ public class KeyUtil {
     }
 
     public static RSAPrivateKey getPrivateKeyFromString(String key) throws Exception {
+        // Take out relevant thing
         String privateKeyPEM = key
                 .replace("-----BEGIN RSA PRIVATE KEY-----", "")
                 .replace("-----END RSA PRIVATE KEY-----", "")
