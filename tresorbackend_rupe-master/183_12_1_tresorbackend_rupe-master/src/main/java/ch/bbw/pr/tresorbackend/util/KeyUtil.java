@@ -1,5 +1,12 @@
 package ch.bbw.pr.tresorbackend.util;
 
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+
+import java.io.StringReader;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -16,22 +23,19 @@ public class KeyUtil {
 
         byte[] encoded = Base64.getDecoder().decode(publicKeyPEM);
 
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded, "RSA");
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return (RSAPublicKey) kf.generatePublic(keySpec);
     }
 
     public static RSAPrivateKey getPrivateKeyFromString(String key) throws Exception {
-        // Take out relevant thing
-        String privateKeyPEM = key
-                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
-                .replace("-----END RSA PRIVATE KEY-----", "")
-                .replaceAll("\\s", "");
+        // Parse PEM format
+        PEMParser pemParser = new PEMParser(new StringReader(key));
+        Object object = pemParser.readObject();
+        pemParser.close();
 
-        byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);
-
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return (RSAPrivateKey) kf.generatePrivate(keySpec);
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+        var privateKey = converter.getPrivateKey(((PEMKeyPair)object).getPrivateKeyInfo());
+        return (RSAPrivateKey)privateKey;
     }
 }
