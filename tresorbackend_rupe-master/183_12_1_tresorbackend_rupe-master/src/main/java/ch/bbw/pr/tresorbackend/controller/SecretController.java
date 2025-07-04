@@ -4,11 +4,10 @@ import ch.bbw.pr.tresorbackend.model.Secret;
 import ch.bbw.pr.tresorbackend.model.NewSecret;
 import ch.bbw.pr.tresorbackend.model.EncryptCredentials;
 import ch.bbw.pr.tresorbackend.model.User;
-import ch.bbw.pr.tresorbackend.service.MasterKeyService;
+import ch.bbw.pr.tresorbackend.service.KeyService;
 import ch.bbw.pr.tresorbackend.service.SecretService;
 import ch.bbw.pr.tresorbackend.service.UserService;
 import ch.bbw.pr.tresorbackend.util.EncryptUtil;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -50,9 +49,9 @@ public class SecretController {
    private static final Logger logger = LoggerFactory.getLogger(SecretController.class);
 
    @Autowired
-   public SecretController(MasterKeyService masterKeyService){
+   public SecretController(KeyService masterKeyService){
       try{
-         encryptUtil = new EncryptUtil(masterKeyService.getMasterKey());
+         encryptUtil = new EncryptUtil(masterKeyService.getPrivateKey());
       }
       catch(FileNotFoundException e){
          logger.error(e.getMessage());
