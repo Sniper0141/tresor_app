@@ -49,9 +49,9 @@ public class SecretController {
    private static final Logger logger = LoggerFactory.getLogger(SecretController.class);
 
    @Autowired
-   public SecretController(KeyService masterKeyService){
+   public SecretController(KeyService keyService){
       try{
-         encryptUtil = new EncryptUtil(masterKeyService.getPrivateKey());
+         encryptUtil = new EncryptUtil(keyService.getPrivateKey());
       }
       catch(FileNotFoundException e){
          logger.error(e.getMessage());
