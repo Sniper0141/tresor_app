@@ -23,8 +23,8 @@ public class KeyUtil {
 
     public static RSAPrivateKey getPrivateKeyFromString(String key) throws Exception {
         String privateKeyPEM = key
-                .replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "")
+                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+                .replace("-----END RSA PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
 
         byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);

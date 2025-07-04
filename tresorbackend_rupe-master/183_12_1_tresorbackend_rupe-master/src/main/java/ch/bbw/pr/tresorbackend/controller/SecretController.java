@@ -51,7 +51,7 @@ public class SecretController {
    @Autowired
    public SecretController(KeyService keyService){
       try{
-         encryptUtil = new EncryptUtil(keyService.getPrivateKey());
+         encryptUtil = new EncryptUtil(keyService.getPublicKey(), keyService.getPrivateKey());
       }
       catch(FileNotFoundException e){
          logger.error(e.getMessage());

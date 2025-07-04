@@ -12,7 +12,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.Objects;
 
 /**
  * EncryptUtil
@@ -22,10 +21,12 @@ import java.util.Objects;
  */
 public class EncryptUtil {
 
-   private final String masterKey;
+    private final String publicKey;
+    private final String privateKey;
 
-   public EncryptUtil(String masterKey) {
-      this.masterKey = masterKey;
+   public EncryptUtil(String publicKey, String privateKey) {
+       this.publicKey = publicKey;
+       this.privateKey = privateKey;
    }
 
    public String encrypt(String data) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -68,15 +69,15 @@ public class EncryptUtil {
       return salt;
    }
 
-   private PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
-      byte[] publicKeyBytes = Objects.requireNonNull(getClass().getResourceAsStream("/key.pub")).readAllBytes();
+   private PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+      byte[] publicKeyBytes = publicKey.getBytes(StandardCharsets.UTF_8);
       var publicKeyFactory = KeyFactory.getInstance("RSA");
       var publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
       return publicKeyFactory.generatePublic(publicKeySpec);
    }
 
-   private PrivateKey getPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
-      byte[] privateKeyBytes = masterKey.getBytes(StandardCharsets.UTF_8);
+   private PrivateKey getPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+      byte[] privateKeyBytes = privateKey.getBytes(StandardCharsets.UTF_8);
       KeyFactory privateKeyFactory = KeyFactory.getInstance("RSA");
       EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
       return privateKeyFactory.generatePrivate(privateKeySpec);
