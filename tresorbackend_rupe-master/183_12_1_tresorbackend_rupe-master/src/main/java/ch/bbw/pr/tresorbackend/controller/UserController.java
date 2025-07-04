@@ -8,6 +8,7 @@ import ch.bbw.pr.tresorbackend.service.UserService;
 import ch.bbw.pr.tresorbackend.util.AuthUtil;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -65,7 +66,7 @@ public class UserController {
         //validate-jwt
         var statusCode = validateJwt(jwt, false, null);
         if(statusCode != null){
-            return ResponseEntity.status(statusCode).body("{\n\t\"message\": \"JWT is invalid.\"\n}");
+            return ResponseEntity.status(statusCode).body("{\n\t\"message\": \"Status code: " + statusCode + "\"\n}");
         }
 
         //input validation
@@ -328,7 +329,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseJson);
     }
 
-    private ResponseEntity<String> getValidLoginResponse(LoginUser loginUser, User user){
+    private ResponseEntity<String> getValidLoginResponse(LoginUser loginUser, User user) {
         AuthUtil authUtil;
         try{
             authUtil = new AuthUtil(keyService.getPublicKey(), keyService.getPrivateKey());
@@ -353,7 +354,7 @@ public class UserController {
         var responseObj = new LoginResponse("Login successful.", user.getId(), jwt);
         var responseBody = new Gson().toJson(responseObj);
 
-        return ResponseEntity.ok().body(responseBody);
+        return ResponseEntity.status(201).body(responseBody);
     }
 
     private Integer validateJwt(String jwt, boolean adminNeeded, String permittedUser){
@@ -361,7 +362,7 @@ public class UserController {
             return null;
         }
 
-        AuthUtil.JwtPayload jwtPayload;
+        Map<String, Claim> jwtPayload;
         try{
             var authUtil = new AuthUtil(keyService.getPublicKey(), keyService.getPrivateKey());
             jwtPayload = authUtil.getPayloadAndVerifyJWT(jwt);
@@ -375,7 +376,7 @@ public class UserController {
 
         // Check if expired
         try{
-            var issuedAt = Integer.parseInt(jwtPayload.iat());
+            var issuedAt = jwtPayload.get("iat").asInt();
             var epochSecondsYesterday = Instant.now().minusSeconds(86400).getEpochSecond();
 
             if(issuedAt < epochSecondsYesterday){
@@ -390,14 +391,14 @@ public class UserController {
 
         // check correct user
         if(permittedUser != null){
-            return jwtPayload.sub().equalsIgnoreCase(permittedUser)
+            return jwtPayload.get("sub").asString().equalsIgnoreCase(permittedUser)
                     ? null
                     : 403;
         }
 
         // check admin
         if(adminNeeded){
-            return jwtPayload.role().equals("Admin")
+            return jwtPayload.get("role").asString().equals("Admin")
                     ? null
                     : 403;
         }

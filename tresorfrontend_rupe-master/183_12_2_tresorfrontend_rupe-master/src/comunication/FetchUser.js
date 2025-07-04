@@ -101,9 +101,13 @@ export const postLogin = async (content) => {
 
         const data = await response.json();
 
-        if(response.status === 200){
+        if(response.status === 201){
             console.log('Login successfully posted:', data);
             document.cookie = `jwt=${data.jwt}; Path=/; Max-Age=86400`
+            return null;
+        }
+        if(response.status === 200){
+            console.log("already logged in.");
             return null;
         }
 

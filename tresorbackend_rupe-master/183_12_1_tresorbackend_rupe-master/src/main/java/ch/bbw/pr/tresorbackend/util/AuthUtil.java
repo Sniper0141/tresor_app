@@ -3,9 +3,10 @@ package ch.bbw.pr.tresorbackend.util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.google.gson.Gson;
+import com.auth0.jwt.interfaces.Claim;
 import java.security.*;
 import java.util.Date;
+import java.util.Map;
 
 public class AuthUtil {
     private final Algorithm algorithm;
@@ -29,17 +30,14 @@ public class AuthUtil {
                 .sign(algorithm);
     }
 
-    public JwtPayload getPayloadAndVerifyJWT(String jwt) {
+    public Map<String, Claim> getPayloadAndVerifyJWT(String jwt) {
         JWTVerifier verifier = JWT.require(algorithm).withIssuer("http://localhost:8080").build();
         var decodedJWT = verifier.verify(jwt);
-        var payloadStr = decodedJWT.getPayload();
-        return new Gson().fromJson(payloadStr, JwtPayload.class);
+        return decodedJWT.getClaims();
     }
 
     public enum Role{
         User,
         Admin
     }
-
-    public record JwtPayload(String sub, String role, String iat) {}
 }
