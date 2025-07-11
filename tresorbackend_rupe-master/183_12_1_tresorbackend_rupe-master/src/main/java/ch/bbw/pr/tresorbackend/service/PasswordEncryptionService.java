@@ -54,7 +54,6 @@ public class PasswordEncryptionService {
 
       } while (salt.contains("$"));
 
-      System.out.println(salt);
       return salt;
    }
 }
