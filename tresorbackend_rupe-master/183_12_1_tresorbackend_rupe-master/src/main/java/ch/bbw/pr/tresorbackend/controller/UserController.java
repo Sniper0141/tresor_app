@@ -48,13 +48,13 @@ public class UserController {
     @Autowired
     public UserController(ConfigProperties configProperties, UserService userService, PasswordEncryptionService passwordService, KeyService keyService) {
         this.configProperties = configProperties;
-        System.out.println("UserController.UserController: cross origin: " + configProperties.getOrigin());
-        // Logging in the constructor
-        logger.info("UserController initialized: " + configProperties.getOrigin());
-        logger.debug("UserController.UserController: Cross Origin Config: {}", configProperties.getOrigin());
         this.userService = userService;
         this.passwordService = passwordService;
         this.keyService = keyService;
+        // Logging in the constructor
+        logger.info("UserController.UserController: cross origin: {}", configProperties.getOrigin());
+        logger.info("UserController initialized: {}", configProperties.getOrigin());
+        logger.debug("UserController.UserController: Cross Origin Config: {}", configProperties.getOrigin());
     }
 
     @CrossOrigin(origins = "${CROSS_ORIGIN}")
@@ -74,7 +74,7 @@ public class UserController {
             List<String> errors = bindingResult.getFieldErrors().stream()
                     .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                     .toList();
-            System.out.println("UserController.doLoginUser " + errors);
+            logger.debug("UserController.doLoginUser {}", errors);
 
             JsonArray arr = new JsonArray();
             errors.forEach(arr::add);
@@ -82,22 +82,22 @@ public class UserController {
             obj.add("message", arr);
             String json = new Gson().toJson(obj);
 
-            System.out.println("UserController.doLoginUser, validation fails: " + json);
+            logger.debug("UserController.doLoginUser, validation fails: {}", json);
             return ResponseEntity.badRequest().body(json);
         }
 
-        System.out.println("UserController.doLoginUser: input validation passed");
+        logger.info("UserController.doLoginUser: input validation passed");
 
         var user = userService.findByEmail(loginUser.getEmail());
         if(user == null){
-            logger.info("UserController.doLoginUser: User not found with email: " + loginUser.getEmail());
+            logger.debug("UserController.doLoginUser: User not found with email: {}", loginUser.getEmail());
             return getWrongEmailOrPasswordResponse(0);
         }
 
         var actualPassword = user.getPassword();
         var loginPassword = loginUser.getPassword();
         if(!passwordService.doPasswordsMatch(loginPassword, actualPassword)){
-            logger.info("UserController.doLoginUser: Passwords do not match");
+            logger.debug("UserController.doLoginUser: Passwords do not match");
             return getWrongEmailOrPasswordResponse(user.getId());
         }
 
@@ -126,7 +126,7 @@ public class UserController {
                .toList();
             return validateInput(errors);
         }
-        System.out.println("UserController.createUser: input validation passed");
+        logger.info("UserController.createUser: input validation passed");
 
         // password validation
         var errorString = validatePassword(registerUser.getPassword());
@@ -139,7 +139,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(json);
         }
 
-        System.out.println("UserController.createUser, password validation passed");
+        logger.info("UserController.createUser, password validation passed");
 
         // captcha validation
         if(reCaptchaPrivateKey == null){
@@ -160,7 +160,7 @@ public class UserController {
             String json = new Gson().toJson(obj);
             return ResponseEntity.badRequest().body(json);
         }
-        System.out.println("UserController.createUser: captcha passed.");
+        logger.info("UserController.createUser: captcha passed.");
 
 
         //transform registerUser to user
@@ -178,7 +178,7 @@ public class UserController {
             ResponseEntity.internalServerError().body("Failed to create user.");
         }
 
-        System.out.println("UserController.createUser, user saved in db");
+        logger.info("UserController.createUser, user saved in db");
         return ResponseEntity.accepted().body(null);
     }
 
@@ -262,7 +262,7 @@ public class UserController {
             return ResponseEntity.status(statusCode).body(null);
         }
 
-        System.out.println("UserController.getUserIdByEmail: " + email);
+        logger.info("UserController.getUserIdByEmail: {}", email);
         //input validation
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream()
@@ -271,28 +271,28 @@ public class UserController {
             return validateInput(errors);
         }
 
-        System.out.println("UserController.getUserIdByEmail: input validation passed");
+        logger.info("UserController.getUserIdByEmail: input validation passed");
 
         User user = userService.findByEmail(email.getEmail());
         if (user == null) {
-            System.out.println("UserController.getUserIdByEmail, no user found with email: " + email);
+            logger.debug("UserController.getUserIdByEmail, no user found with email: {}", email);
             JsonObject obj = new JsonObject();
             obj.addProperty("message", "No user found with this email");
             String json = new Gson().toJson(obj);
 
-            System.out.println("UserController.getUserIdByEmail, fails: " + json);
+            logger.debug("UserController.getUserIdByEmail, fails: {}", json);
             return ResponseEntity.badRequest().body(json);
         }
-        System.out.println("UserController.getUserIdByEmail, user find by email");
+        logger.info("UserController.getUserIdByEmail, user find by email");
         JsonObject obj = new JsonObject();
         obj.addProperty("answer", user.getId());
         String json = new Gson().toJson(obj);
-        System.out.println("UserController.getUserIdByEmail " + json);
+        logger.info("UserController.getUserIdByEmail {}", json);
         return ResponseEntity.accepted().body(json);
     }
 
     private ResponseEntity<String> validateInput(List<String> errors) {
-        System.out.println("UserController.createUser " + errors);
+        logger.debug("UserController.createUser {}", errors);
 
         JsonArray arr = new JsonArray();
         errors.forEach(arr::add);
@@ -300,7 +300,7 @@ public class UserController {
         obj.add("message", arr);
         String json = new Gson().toJson(obj);
 
-        System.out.println("UserController.createUser, validation fails: " + json);
+        logger.debug("UserController.createUser, validation fails: {}", json);
         return ResponseEntity.badRequest().body(json);
     }
 
@@ -380,7 +380,7 @@ public class UserController {
             var epochSecondsYesterday = Instant.now().minusSeconds(86400).getEpochSecond();
 
             if(issuedAt < epochSecondsYesterday){
-                logger.warn("JWT is expired.");
+                logger.debug("JWT is expired.");
                 return null;
             }
         }
