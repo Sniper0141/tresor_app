@@ -65,7 +65,6 @@ public class EncryptUtil {
 
       } while (salt.contains("$"));
 
-      System.out.println(salt);
       return salt;
    }
 
