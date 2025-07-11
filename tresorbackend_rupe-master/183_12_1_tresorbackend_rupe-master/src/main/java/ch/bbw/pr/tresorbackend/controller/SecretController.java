@@ -67,7 +67,7 @@ public class SecretController {
          List<String> errors = bindingResult.getFieldErrors().stream()
                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                .collect(Collectors.toList());
-         System.out.println("SecretController.createSecret " + errors);
+         logger.debug("SecretController.createSecret {}", errors);
 
          JsonArray arr = new JsonArray();
          errors.forEach(arr::add);
@@ -75,10 +75,10 @@ public class SecretController {
          obj.add("message", arr);
          String json = new Gson().toJson(obj);
 
-         System.out.println("SecretController.createSecret, validation fails: " + json);
+         logger.debug("SecretController.createSecret, validation fails: {}", json);
          return ResponseEntity.badRequest().body(json);
       }
-      System.out.println("SecretController.createSecret, input validation passed");
+      logger.info("SecretController.createSecret, input validation passed");
 
       User user = userService.findByEmail(newSecret.getEmail());
 
@@ -97,11 +97,11 @@ public class SecretController {
       }
       //save secret in db
       secretService.createSecret(secret);
-      System.out.println("SecretController.createSecret, secret saved in db");
+      logger.info("SecretController.createSecret, secret saved in db");
       JsonObject obj = new JsonObject();
       obj.addProperty("answer", "Secret saved");
       String json = new Gson().toJson(obj);
-      System.out.println("SecretController.createSecret " + json);
+      logger.info("SecretController.createSecret {}", json);
       return ResponseEntity.accepted().body(json);
    }
 
@@ -109,11 +109,11 @@ public class SecretController {
    @CrossOrigin(origins = "${CROSS_ORIGIN}")
    @PostMapping("/byuserid")
    public ResponseEntity<List<Secret>> getSecretsByUserId(@RequestBody EncryptCredentials credentials) {
-      System.out.println("SecretController.getSecretsByUserId " + credentials);
+      logger.info("SecretController.getSecretsByUserId {}", credentials);
 
       List<Secret> secrets = secretService.getSecretsByUserId(credentials.getUserId());
       if (secrets.isEmpty()) {
-         System.out.println("SecretController.getSecretsByUserId secret isEmpty");
+         logger.debug("SecretController.getSecretsByUserId secret isEmpty");
          return ResponseEntity.notFound().build();
       }
       //Decrypt content
@@ -122,18 +122,18 @@ public class SecretController {
             secret.setContent(encryptUtil.decrypt(secret.getContent()));
          }
          catch (EncryptionOperationNotPossibleException e) {
-            System.out.println("SecretController.getSecretsByUserId " + e + " " + secret);
+            logger.debug("SecretController.getSecretsByUserId {} {}", e, secret);
             secret.setContent("not encryptable. Wrong password?");
          }
          catch (NoSuchAlgorithmException | InvalidKeySpecException |
                 IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                 BadPaddingException e){
-            System.out.println("SecretController.getSecretsByUserId " + e + " " + secret);
+            logger.error("SecretController.getSecretsByUserId {} {}", e, secret);
             secret.setContent("Failed to decrypt this secret, try again...");
          }
       }
 
-      System.out.println("SecretController.getSecretsByUserId " + secrets);
+      logger.info("SecretController.getSecretsByUserId {}", secrets);
       return ResponseEntity.ok(secrets);
    }
 
@@ -141,13 +141,13 @@ public class SecretController {
    @CrossOrigin(origins = "${CROSS_ORIGIN}")
    @PostMapping("/byemail")
    public ResponseEntity<List<Secret>> getSecretsByEmail(@RequestBody EncryptCredentials credentials) {
-      System.out.println("SecretController.getSecretsByEmail " + credentials);
+      logger.info("SecretController.getSecretsByEmail {}", credentials);
 
       User user = userService.findByEmail(credentials.getEmail());
 
       List<Secret> secrets = secretService.getSecretsByUserId(user.getId());
       if (secrets.isEmpty()) {
-         System.out.println("SecretController.getSecretsByEmail secret isEmpty");
+         logger.info("SecretController.getSecretsByEmail secret isEmpty");
          return ResponseEntity.notFound().build();
       }
       //Decrypt content
@@ -156,18 +156,18 @@ public class SecretController {
             secret.setContent(encryptUtil.decrypt(secret.getContent()));
          }
          catch (EncryptionOperationNotPossibleException e) {
-            System.out.println("SecretController.getSecretsByEmail " + e + " " + secret);
+            logger.debug("SecretController.getSecretsByEmail {} {}", e, secret);
             secret.setContent("not encryptable. Wrong password?");
          }
          catch (NoSuchAlgorithmException | InvalidKeySpecException |
                 IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                 BadPaddingException e){
-            System.out.println("SecretController.getSecretsByEmail " + e + " " + secret);
+            logger.debug("SecretController.getSecretsByEmail {} {}", e, secret);
             secret.setContent("Failed to decrypt this secret, try again...");
          }
       }
 
-      System.out.println("SecretController.getSecretsByEmail " + secrets);
+      logger.info("SecretController.getSecretsByEmail {}", secrets);
       return ResponseEntity.ok(secrets);
    }
 
@@ -193,7 +193,7 @@ public class SecretController {
          List<String> errors = bindingResult.getFieldErrors().stream()
                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                .collect(Collectors.toList());
-         System.out.println("SecretController.createSecret " + errors);
+         logger.debug("SecretController.createSecret {}", errors);
 
          JsonArray arr = new JsonArray();
          errors.forEach(arr::add);
@@ -201,29 +201,29 @@ public class SecretController {
          obj.add("message", arr);
          String json = new Gson().toJson(obj);
 
-         System.out.println("SecretController.updateSecret, validation fails: " + json);
+         logger.debug("SecretController.updateSecret, validation fails: {}", json);
          return ResponseEntity.badRequest().body(json);
       }
 
       //get Secret with id
       Secret dbSecret = secretService.getSecretById(secretId);
       if(dbSecret == null){
-         System.out.println("SecretController.updateSecret, secret not found in db");
+         logger.debug("SecretController.updateSecret, secret not found in db");
          JsonObject obj = new JsonObject();
          obj.addProperty("answer", "Secret not found in db");
          String json = new Gson().toJson(obj);
-         System.out.println("SecretController.updateSecret failed:" + json);
+         logger.debug("SecretController.updateSecret failed:{}", json);
          return ResponseEntity.badRequest().body(json);
       }
       User user = userService.findByEmail(newSecret.getEmail());
 
       //check if Secret in db has not same userid
       if(dbSecret.getUserId() != user.getId()){
-         System.out.println("SecretController.updateSecret, not same user id");
+         logger.debug("SecretController.updateSecret, not same user id");
          JsonObject obj = new JsonObject();
          obj.addProperty("answer", "Secret has not same user id");
          String json = new Gson().toJson(obj);
-         System.out.println("SecretController.updateSecret failed:" + json);
+         logger.debug("SecretController.updateSecret failed:{}", json);
          return ResponseEntity.badRequest().body(json);
       }
       //check if Secret can be decrypted with password
@@ -231,22 +231,22 @@ public class SecretController {
          encryptUtil.decrypt(dbSecret.getContent());
       }
       catch (EncryptionOperationNotPossibleException e) {
-         System.out.println("SecretController.updateSecret, invalid password");
+         logger.info("SecretController.updateSecret, invalid password");
          JsonObject obj = new JsonObject();
          obj.addProperty("answer", "Password not correct.");
          String json = new Gson().toJson(obj);
-         System.out.println("SecretController.updateSecret failed:" + json);
+         logger.debug("SecretController.updateSecret failed:{}", json);
          return ResponseEntity.badRequest().body(json);
       }
       catch (NoSuchAlgorithmException | InvalidKeySpecException |
              IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
              BadPaddingException e){
-         System.out.println("SecretController.updateSecret " + e + " " + dbSecret);
+         logger.debug("SecretController.updateSecret {} {}", e, dbSecret);
 
          JsonObject obj = new JsonObject();
          obj.addProperty("answer", "Internal Server Error (500)");
          String json = new Gson().toJson(obj);
-         System.out.println("SecretController.updateSecret " + json);
+         logger.debug("SecretController.updateSecret {}", json);
          return ResponseEntity.internalServerError().body(json);
       }
 
@@ -263,22 +263,22 @@ public class SecretController {
       catch (NoSuchAlgorithmException | InvalidKeySpecException |
              IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
              BadPaddingException e){
-         System.out.println("SecretController.updateSecret " + e + " " + newSecret);
+         logger.debug("SecretController.updateSecret {} {}", e, newSecret);
 
          JsonObject obj = new JsonObject();
          obj.addProperty("answer", "Internal Server Error (500)");
          String json = new Gson().toJson(obj);
-         System.out.println("SecretController.updateSecret " + json);
+         logger.debug("SecretController.updateSecret {}", json);
          return ResponseEntity.internalServerError().body(json);
       }
 
       //save secret in db
       secretService.createSecret(secret);
-      System.out.println("SecretController.updateSecret, secret updated in db");
+      logger.info("SecretController.updateSecret, secret updated in db");
       JsonObject obj = new JsonObject();
       obj.addProperty("answer", "Secret updated");
       String json = new Gson().toJson(obj);
-      System.out.println("SecretController.updateSecret " + json);
+      logger.info("SecretController.updateSecret {}", json);
       return ResponseEntity.accepted().body(json);
    }
 
@@ -288,7 +288,7 @@ public class SecretController {
    public ResponseEntity<String> deleteSecret(@PathVariable("id") Long secretId) {
       //todo: Some kind of brute force delete, perhaps test first userid and encryptpassword
       secretService.deleteSecret(secretId);
-      System.out.println("SecretController.deleteSecret succesfully: " + secretId);
+      logger.info("SecretController.deleteSecret succesfully: {}", secretId);
       return new ResponseEntity<>("Secret successfully deleted!", HttpStatus.OK);
    }
 }
