@@ -1,9 +1,13 @@
 package ch.bbw.pr.tresorbackend.util;
 
+import ch.bbw.pr.tresorbackend.controller.UserController;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.*;
 import java.util.Date;
 import java.util.Map;
@@ -12,9 +16,6 @@ public class AuthUtil {
     private final Algorithm algorithm;
 
     public AuthUtil(String publicKeyStr, String privateKeyStr) throws Exception {
-        System.out.println(publicKeyStr);
-        System.out.println(privateKeyStr);
-
         var pubKey = KeyUtil.getPublicKeyFromString(publicKeyStr);
         var privateKey = KeyUtil.getPrivateKeyFromString(privateKeyStr);
 
