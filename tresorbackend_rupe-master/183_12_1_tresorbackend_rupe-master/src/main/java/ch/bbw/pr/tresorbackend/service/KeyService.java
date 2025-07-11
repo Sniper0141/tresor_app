@@ -11,8 +11,7 @@ public class KeyService {
     public String getPrivateKey() throws FileNotFoundException {
         var secretFile = new File("C:\\Development\\Schule\\Modul_183\\secrets\\tresor_app_master_key.txt");
 
-        Scanner scanner;
-        scanner = new Scanner(secretFile);
+        var scanner = new Scanner(secretFile);
 
         StringBuilder result = new StringBuilder();
         while (scanner.hasNextLine()) {
@@ -26,15 +25,14 @@ public class KeyService {
     public String getPublicKey() throws FileNotFoundException {
         var secretFile = new File("C:\\Development\\Schule\\Modul_183\\secrets\\tresor_app_public_key.txt");
 
-        Scanner scanner;
-        scanner = new Scanner(secretFile);
+        var scanner = new Scanner(secretFile);
 
-        StringBuilder result = new StringBuilder();
+        var stringBuilder = new StringBuilder();
         while (scanner.hasNextLine()) {
             var line = scanner.nextLine();
-            result.append(line).append("\n");
+            stringBuilder.append(line).append("\n");
         }
 
-        return result.toString();
+        return stringBuilder.toString();
     }
 }
